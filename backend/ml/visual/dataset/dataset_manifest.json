@@ -1,0 +1,51 @@
+{
+  "dataset_name": "SmartCart Real E-Commerce Product Image Dataset",
+  "license": "Unsplash License (free for commercial and personal use)",
+  "categories": [
+    "Shoes",
+    "Shirts",
+    "Electronics",
+    "Accessories",
+    "Bags",
+    "Other"
+  ],
+  "total_images": 84,
+  "splits": {
+    "Shoes": {
+      "train": 10,
+      "val": 2,
+      "test": 3,
+      "total": 15
+    },
+    "Shirts": {
+      "train": 10,
+      "val": 2,
+      "test": 2,
+      "total": 14
+    },
+    "Electronics": {
+      "train": 10,
+      "val": 2,
+      "test": 3,
+      "total": 15
+    },
+    "Accessories": {
+      "train": 9,
+      "val": 2,
+      "test": 2,
+      "total": 13
+    },
+    "Bags": {
+      "train": 9,
+      "val": 2,
+      "test": 2,
+      "total": 13
+    },
+    "Other": {
+      "train": 10,
+      "val": 2,
+      "test": 2,
+      "total": 14
+    }
+  }
+}

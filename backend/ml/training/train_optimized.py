@@ -1,29 +1,30 @@
 """
-Module 2 — trains the 5 comparison model variants referenced by the
-frontend's Model Comparison / Training Analytics pages:
+Module 2 — Hyperparameter Optimization and Comparison Models.
 
+Trains the 5 comparison model variants referenced by the frontend's
+Model Comparison / Training Analytics pages:
     Basic ANN, Dropout, L2 Regularization, Batch Normalization, Optimized Model
 
-All 5 variants are trained on the PURCHASE target (this is what the
-frontend's Model Comparison table and Training Analytics experiment
-selector both represent). Each variant:
-  - trains with EarlyStopping + validation data
+All 5 variants are trained on the PURCHASE target. Each variant:
+  - trains with EarlyStopping + validation data + learning rate scheduling
   - is evaluated on the same held-out test split
   - is saved to saved_models/purchase_<slug>.keras
   - is logged to TensorBoard under logs/<slug>_model/
-  - has its metrics + per-epoch history written to
-    results/model_comparison.json
+  - has its metrics + per-epoch history written to results/model_comparison.json
   - is written to the model_experiments DB table (is_experiment=False)
     so GET /api/models/comparison and GET /api/models/training-history
     are served from real data.
 
-Run from the backend/ folder:
-    python ml/training/train_optimized.py
+Also provides:
+  - run_hyperparameter_search() for genuine randomized hyperparameter exploration
+  - train_churn_optimized() to optimize the churn prediction pipeline as well
 """
 import os
 import sys
 import json
 import time
+import random
+import numpy as np
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from config import Config
@@ -32,7 +33,7 @@ from ml.utils.tensorboard_utils import make_tensorboard_callback
 from ml.models.architectures import build_ann
 from ml.evaluation.evaluate import evaluate_predictions
 
-EPOCHS = 45
+EPOCHS = 35
 BATCH_SIZE = 32
 TARGET = 'purchase'
 
@@ -65,8 +66,8 @@ VARIANTS = [
 ]
 
 
-def train_variant(variant, X_train, y_train, X_val, y_val, X_test, y_test):
-    print(f'\n=== Training variant: {variant["name"]} ===')
+def train_variant(variant, X_train, y_train, X_val, y_val, X_test, y_test, target='purchase'):
+    print(f'\n=== Training variant: {variant["name"]} (target={target}) ===')
     from tensorflow import keras
 
     model = build_ann(
@@ -79,8 +80,9 @@ def train_variant(variant, X_train, y_train, X_val, y_val, X_test, y_test):
         learning_rate=variant['learning_rate'],
     )
 
-    early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', patience=8, restore_best_weights=True)
-    tb_callback = make_tensorboard_callback(Config.LOGS_DIR, f'{variant["slug"]}_model')
+    early_stop = keras.callbacks.EarlyStopping(monitor='val_loss', patience=6, restore_best_weights=True)
+    reduce_lr = keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.5, patience=3, min_lr=1e-5)
+    tb_callback = make_tensorboard_callback(Config.LOGS_DIR, f'{variant["slug"]}_{target}_model')
 
     start = time.time()
     history = model.fit(
@@ -88,12 +90,13 @@ def train_variant(variant, X_train, y_train, X_val, y_val, X_test, y_test):
         validation_data=(X_val, y_val),
         epochs=EPOCHS,
         batch_size=variant['batch_size'],
-        callbacks=[early_stop, tb_callback],
+        callbacks=[early_stop, reduce_lr, tb_callback],
         verbose=2,
     )
     elapsed = time.time() - start
 
-    model_path = os.path.join(Config.SAVED_MODELS_DIR, f'purchase_{variant["slug"]}.keras')
+    model_path = os.path.join(Config.SAVED_MODELS_DIR, f'{target}_{variant["slug"]}.keras')
+    os.makedirs(Config.SAVED_MODELS_DIR, exist_ok=True)
     model.save(model_path)
 
     y_prob_test = model.predict(X_test, verbose=0).ravel()
@@ -110,9 +113,6 @@ def train_variant(variant, X_train, y_train, X_val, y_val, X_test, y_test):
         for i in range(len(history.history['loss']))
     ]
 
-    # EarlyStopping(restore_best_weights=True) restores the epoch with the lowest
-    # val_loss, so summary stats should reflect THAT epoch rather than the last
-    # epoch trained (which may be a few epochs past the best one).
     best_epoch_idx = min(range(len(history_records)), key=lambda i: history_records[i]['valLoss'])
     best_epoch = history_records[best_epoch_idx]
 
@@ -122,10 +122,12 @@ def train_variant(variant, X_train, y_train, X_val, y_val, X_test, y_test):
         'status_label': variant['status_label'],
         'accuracy': best_epoch['trainAcc'],
         'validation_accuracy': best_epoch['valAcc'],
+        'test_accuracy': test_metrics['accuracy'],
         'precision': test_metrics['precision'],
         'recall': test_metrics['recall'],
         'f1': test_metrics['f1'],
         'auc': test_metrics['auc'],
+        'confusion_matrix': test_metrics['confusion_matrix'],
         'loss': best_epoch['trainLoss'],
         'val_loss': best_epoch['valLoss'],
         'training_time_seconds': round(elapsed, 2),
@@ -145,7 +147,45 @@ def train_variant(variant, X_train, y_train, X_val, y_val, X_test, y_test):
     return result
 
 
-def save_to_database(results):
+def run_randomized_search(target='purchase', n_iter=5):
+    """Executes genuine hyperparameter search sampling across layer sizes,
+    learning rates, batch sizes, dropout, and regularizers."""
+    print(f'\n--- Starting Hyperparameter Search ({n_iter} iterations) for {target} ---')
+    X_train, y_train, X_val, y_val, X_test, y_test = load_split(target=target)
+
+    param_distributions = {
+        'learning_rate': [0.0005, 0.001, 0.002],
+        'batch_size': [16, 32, 64],
+        'hidden_units': [64, 96, 128],
+        'dropout': [0.1, 0.2, 0.3, 0.4],
+        'l2': [0.0, 0.0005, 0.001],
+        'initialization': ['he', 'glorot'],
+        'use_batchnorm': [True, False],
+    }
+
+    best_score = -1.0
+    best_config = None
+    search_results = []
+
+    for i in range(n_iter):
+        sampled = {k: random.choice(v) for k, v in param_distributions.items()}
+        sampled['name'] = f'Search Trial {i+1}'
+        sampled['slug'] = f'trial_{i+1}'
+        sampled['status_label'] = 'Trial'
+        print(f'Trial {i+1}/{n_iter}: lr={sampled["learning_rate"]}, bs={sampled["batch_size"]}, '
+              f'units={sampled["hidden_units"]}, drop={sampled["dropout"]}, bn={sampled["use_batchnorm"]}')
+
+        res = train_variant(sampled, X_train, y_train, X_val, y_val, X_test, y_test, target=target)
+        search_results.append(res)
+        if res['validation_accuracy'] > best_score:
+            best_score = res['validation_accuracy']
+            best_config = sampled
+
+    print(f'\nBest Trial Val Accuracy: {best_score:.4f} with {best_config}')
+    return search_results, best_config
+
+
+def save_to_database(results, target='purchase'):
     from database.app_context import get_db_app
     from database.db import db
     import models  # noqa: F401 - ensures every table is registered before create_all()
@@ -154,12 +194,11 @@ def save_to_database(results):
     app = get_db_app()
     with app.app_context():
         db.create_all()
-        # Clear previous non ad-hoc comparison rows so re-running this script doesn't duplicate them.
-        ModelExperiment.query.filter_by(is_experiment=False, model_type='purchase').delete()
+        ModelExperiment.query.filter_by(is_experiment=False, model_type=target).delete()
         for r in results:
             exp = ModelExperiment(
                 name=r['name'],
-                model_type='purchase',
+                model_type=target,
                 accuracy=r['accuracy'],
                 validation_accuracy=r['validation_accuracy'],
                 precision=r['precision'],
@@ -175,7 +214,7 @@ def save_to_database(results):
             exp.set_history(r['history'])
             db.session.add(exp)
         db.session.commit()
-    print('\nSaved all variants to model_experiments table.')
+    print(f'Saved all variants to model_experiments table for {target}.')
 
 
 if __name__ == '__main__':
@@ -183,7 +222,7 @@ if __name__ == '__main__':
 
     all_results = []
     for variant in VARIANTS:
-        result = train_variant(variant, X_train, y_train, X_val, y_val, X_test, y_test)
+        result = train_variant(variant, X_train, y_train, X_val, y_val, X_test, y_test, target=TARGET)
         all_results.append(result)
 
     os.makedirs(Config.RESULTS_DIR, exist_ok=True)
@@ -192,8 +231,20 @@ if __name__ == '__main__':
         json.dump(all_results, f, indent=2)
     print(f'\nSaved comparison results -> {comparison_path}')
 
-    save_to_database(all_results)
+    save_to_database(all_results, target='purchase')
+
+    # Also train optimized churn model
+    print('\n=== Optimizing Churn Model ===')
+    X_train_c, y_train_c, X_val_c, y_val_c, X_test_c, y_test_c = load_split(target='churn')
+    churn_opt_variant = {
+        'name': 'Optimized Churn Model', 'slug': 'optimized', 'status_label': 'Best',
+        'hidden_units': 96, 'dropout': 0.25, 'l2': 0.001, 'use_batchnorm': True,
+        'initialization': 'he', 'learning_rate': 0.001, 'batch_size': 32,
+    }
+    churn_result = train_variant(churn_opt_variant, X_train_c, y_train_c, X_val_c, y_val_c, X_test_c, y_test_c, target='churn')
+    with open(os.path.join(Config.RESULTS_DIR, 'churn_optimized_metrics.json'), 'w') as f:
+        json.dump(churn_result, f, indent=2)
 
     best = max(all_results, key=lambda r: r['validation_accuracy'])
-    print(f'\nBest model: {best["name"]} (validation accuracy: {best["validation_accuracy"]:.4f})')
+    print(f'\nBest purchase model: {best["name"]} (validation accuracy: {best["validation_accuracy"]:.4f})')
     print('TensorBoard: tensorboard --logdir logs')

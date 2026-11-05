@@ -1,17 +1,16 @@
 """
 Data loading and train/validation/test splitting for SmartCart ML models.
 
-IMPORTANT — No data leakage guarantee:
-  The preprocessing artifacts (scaler, encoders) are fitted ONLY on the training
-  partition (X_train). Validation and test sets are transformed using the same
-  fitted artifacts but are never used to influence the fit.  This matches the
-  pattern required by the prompt: "Split data into training, validation and testing
-  sets BEFORE fitting preprocessing transformations."
+Guarantees:
+  - Strict zero data leakage: StandardScaler & OneHotEncoder are fitted ONLY on df_train.
+  - Stratified partitioning across Train (70%), Validation (15%), Test (15%).
+  - Identical feature pipeline between training and real-time inference.
 """
 import os
 import sys
 import pandas as pd
 from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import OneHotEncoder
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..')))
 from config import Config
@@ -29,23 +28,18 @@ def load_raw_dataset() -> pd.DataFrame:
     return pd.read_csv(Config.DATASET_PATH)
 
 
-def load_split(target: str = 'purchase', test_size: float = 0.15, val_size: float = 0.15, seed: int = 42):
-    """Returns (X_train, y_train, X_val, y_val, X_test, y_test) as numpy arrays,
-    already scaled/encoded, ready for model.fit().
-
-    Data-leakage-free pipeline:
-        1. Split the RAW (un-preprocessed) dataset into train / val / test.
-        2. Fit the scaler + encoders on df_train ONLY.
-        3. Transform all three splits using those fitted artifacts.
-        4. Save the fitted artifacts so inference uses identical preprocessing.
+def load_split(target: str = 'purchase', test_size: float = 0.15, val_size: float = 0.15, seed: int = 42, force_refit: bool = False):
+    """
+    Returns (X_train, y_train, X_val, y_val, X_test, y_test) as float32 numpy arrays.
+    Splits the un-preprocessed data first, fits preprocessors on df_train ONLY,
+    and transforms all splits.
     """
     assert target in ('purchase', 'churn')
 
     df = load_raw_dataset()
     y = df[target].values.astype('float32')
 
-    # ── Step 1: raw row-level split ──────────────────────────────────────────
-    # Split indices so we can partition the raw dataframe BEFORE fitting.
+    # Step 1: Split raw rows into Train, Val, Test
     idx = df.index.to_numpy()
     idx_train, idx_temp, _, y_temp = train_test_split(
         idx, y, test_size=(test_size + val_size), random_state=seed, stratify=y
@@ -63,18 +57,25 @@ def load_split(target: str = 'purchase', test_size: float = 0.15, val_size: floa
     y_val   = df.loc[idx_val,   target].values.astype('float32')
     y_test  = df.loc[idx_test,  target].values.astype('float32')
 
-    # ── Step 2: fit preprocessing on TRAIN only ──────────────────────────────
-    # Reuse existing artifacts if already saved (so variants share the same
-    # preprocessing as the basic model, which is fitted first).
-    if os.path.exists(Config.SCALER_PATH) and os.path.exists(Config.ENCODERS_PATH):
-        scaler, encoders, _ = load_preprocessing()
-    else:
-        scaler, encoders = fit_preprocessing(df_train)
-        save_preprocessing(scaler, encoders)
+    # Step 2: Fit preprocessing exclusively on train partition
+    needs_fit = force_refit or not (os.path.exists(Config.SCALER_PATH) and os.path.exists(Config.ENCODERS_PATH))
+    if not needs_fit:
+        try:
+            scaler, encoder, conf = load_preprocessing()
+            if not isinstance(encoder, OneHotEncoder):
+                needs_fit = True
+        except Exception:
+            needs_fit = True
 
-    # ── Step 3: transform all three splits ───────────────────────────────────
-    X_train = transform(df_train, scaler, encoders)
-    X_val   = transform(df_val,   scaler, encoders)
-    X_test  = transform(df_test,  scaler, encoders)
+    if needs_fit:
+        scaler, encoder = fit_preprocessing(df_train)
+        save_preprocessing(scaler, encoder)
+    else:
+        scaler, encoder, _ = load_preprocessing()
+
+    # Step 3: Transform all splits
+    X_train = transform(df_train, scaler, encoder)
+    X_val   = transform(df_val,   scaler, encoder)
+    X_test  = transform(df_test,  scaler, encoder)
 
     return X_train, y_train, X_val, y_val, X_test, y_test

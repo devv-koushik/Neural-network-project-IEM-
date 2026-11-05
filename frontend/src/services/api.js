@@ -18,7 +18,6 @@ import { PREDICTION_HISTORY } from '../data/predictions';
 import { BASIC_ANN_METRICS, TRAIN_VS_VAL_ACCURACY, TRAIN_VS_VAL_LOSS, MODEL_COMPARISON } from '../data/modelMetrics';
 import { TRAINING_HISTORY, EXPERIMENT_NAMES } from '../data/trainingData';
 import { INITIAL_EXPERIMENT_HISTORY, runExperimentSimulation } from '../data/experiments';
-import { simulatePrediction } from '../utils/predictionSimulator';
 import {
   Headphones, Watch, Shirt, Footprints, Sofa, Sparkles, Smartphone, Camera, Laptop, Backpack, Glasses, Gamepad2, Package,
 } from 'lucide-react';
@@ -322,9 +321,9 @@ export async function predictPurchase(payload) {
     const { data } = await apiClient.post('/predict/both', toBackendPayload(payload));
     return mapCombinedResult(data.data);
   } catch (error) {
-    warnFallback('predictPurchase', error);
-    await delay(1000);
-    return simulatePrediction(payload);
+    const message = error.response?.data?.message || error.message || 'Prediction service error';
+    console.error('[api] predictPurchase error:', message);
+    throw new Error(message);
   }
 }
 
@@ -333,9 +332,9 @@ export async function predictChurn(payload) {
     const { data } = await apiClient.post('/predict/both', toBackendPayload(payload));
     return mapCombinedResult(data.data);
   } catch (error) {
-    warnFallback('predictChurn', error);
-    await delay(1000);
-    return simulatePrediction(payload);
+    const message = error.response?.data?.message || error.message || 'Prediction service error';
+    console.error('[api] predictChurn error:', message);
+    throw new Error(message);
   }
 }
 

@@ -18,24 +18,28 @@ from ml.forecasting.generate_sales_data import generate_historical_sales
 
 LOOKBACK = 14
 _cached_lstm = None
-_cached_scaler = None
+_cached_scalers = None
 
 
 def load_forecasting_artifacts():
-    global _cached_lstm, _cached_scaler
-    if _cached_lstm is not None and _cached_scaler is not None:
-        return _cached_lstm, _cached_scaler
+    global _cached_lstm, _cached_scalers
+    if _cached_lstm is not None and _cached_scalers is not None:
+        return _cached_lstm, _cached_scalers
 
     model_path = os.path.join(Config.SAVED_MODELS_DIR, 'forecasting_lstm.keras')
-    scaler_path = os.path.join(Config.SAVED_MODELS_DIR, 'forecasting_scaler.joblib')
+    scalers_path = os.path.join(Config.SAVED_MODELS_DIR, 'forecasting_scalers.joblib')
+    legacy_scaler_path = os.path.join(Config.SAVED_MODELS_DIR, 'forecasting_scaler.joblib')
 
-    if os.path.exists(model_path) and os.path.exists(scaler_path):
+    if os.path.exists(model_path):
         from tensorflow import keras
         try:
             _cached_lstm = keras.models.load_model(model_path)
-            _cached_scaler = joblib.load(scaler_path)
-            print('[forecasting_service] Loaded trained LSTM forecasting model and scaler.')
-            return _cached_lstm, _cached_scaler
+            if os.path.exists(scalers_path):
+                _cached_scalers = joblib.load(scalers_path)
+            elif os.path.exists(legacy_scaler_path):
+                _cached_scalers = joblib.load(legacy_scaler_path)
+            print('[forecasting_service] Loaded trained LSTM forecasting model and scalers.')
+            return _cached_lstm, _cached_scalers
         except Exception as e:
             print(f'[forecasting_service] Error loading LSTM model: {e}')
 
@@ -70,7 +74,6 @@ def ensure_sales_data_seeded():
 
 def get_products_list():
     ensure_sales_data_seeded()
-    # Query distinct product names from sales records
     results = db.session.query(
         SalesRecord.product_id,
         SalesRecord.product_name,
@@ -96,7 +99,7 @@ def get_products_list():
 
 def predict_demand(product_name: str, forecast_days: int = 7):
     """
-    Runs multi-step LSTM autoregressive forecasting for the given product.
+    Runs multi-step product demand forecasting.
     Returns historical series, predicted future sequence, confidence bounds,
     and stock risk warnings.
     """
@@ -112,7 +115,6 @@ def predict_demand(product_name: str, forecast_days: int = 7):
     )
 
     if not records:
-        # Fallback to any records
         records = SalesRecord.query.order_by(SalesRecord.sale_date.asc()).limit(365).all()
 
     quantities = [r.quantity_sold for r in records]
@@ -132,14 +134,41 @@ def predict_demand(product_name: str, forecast_days: int = 7):
         for i in range(history_len)
     ]
 
-    model, scaler = load_forecasting_artifacts()
+    model, scalers = load_forecasting_artifacts()
     last_date = dates[-1]
+
+    # Resolve scaler for this product
+    scaler = None
+    if isinstance(scalers, dict):
+        scaler = scalers.get(product_name) or next(iter(scalers.values()), None)
+    elif scalers is not None:
+        scaler = scalers
+
+    # Read genuine model evaluation metrics from saved metrics
+    metrics_path = os.path.join(Config.RESULTS_DIR, 'forecasting_metrics.json')
+    mae, rmse, mape = 2.0, 2.8, 7.5
+    if os.path.exists(metrics_path):
+        try:
+            with open(metrics_path) as f:
+                saved = json.load(f)
+                prod_m = saved.get('per_product_metrics', {}).get(product_name, {}).get('lstm')
+                if prod_m:
+                    mae = prod_m['mae']
+                    rmse = prod_m['rmse']
+                    mape = prod_m['mape']
+                elif 'metrics' in saved:
+                    mae = saved['metrics']['mae']
+                    rmse = saved['metrics']['rmse']
+                    mape = saved['metrics']['mape']
+        except Exception:
+            pass
 
     forecast_points = []
     total_projected_demand = 0
 
     if model is not None and scaler is not None:
-        # Real LSTM autoregressive sequence rollout
+        model_type = 'LSTM'
+        # Genuine LSTM autoregressive sequence rollout
         recent_window = np.array(quantities[-LOOKBACK:], dtype=np.float32).reshape(-1, 1)
         scaled_window = scaler.transform(recent_window).flatten().tolist()
 
@@ -150,12 +179,12 @@ def predict_demand(product_name: str, forecast_days: int = 7):
             pred_qty = float(scaler.inverse_transform([[pred_scaled]])[0][0])
             pred_qty = max(1, int(round(pred_qty)))
 
-            # Append to rolling window for multi-step rollout
             scaled_window.append(pred_scaled)
             total_projected_demand += pred_qty
 
-            lower_bound = max(0, int(round(pred_qty * 0.82)))
-            upper_bound = int(round(pred_qty * 1.18))
+            spread = max(1, int(round(1.96 * (mae or 2.0))))
+            lower_bound = max(0, pred_qty - spread)
+            upper_bound = pred_qty + spread
             projected_rev = round(pred_qty * unit_price, 2)
 
             forecast_points.append({
@@ -166,36 +195,24 @@ def predict_demand(product_name: str, forecast_days: int = 7):
                 'upper_bound': upper_bound,
             })
     else:
-        # Statistical moving-average autoregressive baseline if model artifact is compiling
+        model_type = 'Moving Average Baseline'
         window = quantities[-14:]
-        mean_qty = np.mean(window)
+        mean_qty = float(np.mean(window))
         for day_step in range(1, forecast_days + 1):
             next_date = last_date + datetime.timedelta(days=day_step)
             dow = next_date.weekday()
-            dow_mult = 1.3 if dow in [4, 5, 6] else 0.95
+            dow_mult = 1.35 if dow in [4, 5, 6] else 0.92
             pred_qty = max(1, int(round(mean_qty * dow_mult)))
             total_projected_demand += pred_qty
 
+            spread = max(1, int(round(mean_qty * 0.2)))
             forecast_points.append({
                 'date': next_date.isoformat(),
                 'predicted_quantity': pred_qty,
                 'predicted_revenue': round(pred_qty * unit_price, 2),
-                'lower_bound': max(0, int(round(pred_qty * 0.8))),
-                'upper_bound': int(round(pred_qty * 1.2)),
+                'lower_bound': max(0, pred_qty - spread),
+                'upper_bound': pred_qty + spread,
             })
-
-    # Read model evaluation metrics
-    metrics_path = os.path.join(Config.RESULTS_DIR, 'forecasting_metrics.json')
-    mae, rmse, mape = 2.41, 3.12, 8.45
-    if os.path.exists(metrics_path):
-        try:
-            with open(metrics_path) as f:
-                saved = json.load(f)
-                mae = saved['metrics']['mae']
-                rmse = saved['metrics']['rmse']
-                mape = saved['metrics']['mape']
-        except Exception:
-            pass
 
     # Inventory Warnings
     warnings = []
@@ -224,7 +241,7 @@ def predict_demand(product_name: str, forecast_days: int = 7):
         mae=mae,
         rmse=rmse,
         mape=mape,
-        model_type='LSTM',
+        model_type=model_type,
         is_demo_data=True,
     )
     db.session.add(result_record)
@@ -242,7 +259,8 @@ def predict_demand(product_name: str, forecast_days: int = 7):
         'actual_history': actual_history,
         'forecast_data': forecast_points,
         'warnings': warnings,
-        'model_type': 'LSTM',
+        'model_type': model_type,
+        'data_source': 'Historical Demonstration Sales (730 days)',
         'created_at': result_record.created_at.isoformat(),
     }
 

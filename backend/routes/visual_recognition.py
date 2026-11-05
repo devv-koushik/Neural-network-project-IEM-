@@ -55,6 +55,13 @@ def predict():
             'filename': orig_name,
             'created_at': saved_record.created_at.isoformat() if saved_record.created_at else None,
         })
+    except visual_service.ModelNotTrainedError as e:
+        if os.path.exists(file_path):
+            try:
+                os.remove(file_path)
+            except Exception:
+                pass
+        return err(str(e), 'MODEL_NOT_TRAINED', 503)
     except Exception as e:
         if os.path.exists(file_path):
             try:

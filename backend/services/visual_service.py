@@ -22,6 +22,10 @@ _cached_model = None
 _cached_classes = None
 
 
+class ModelNotTrainedError(Exception):
+    pass
+
+
 def get_upload_dir():
     upload_dir = os.path.join(Config.BASE_DIR, 'uploads', 'visual')
     os.makedirs(upload_dir, exist_ok=True)
@@ -40,29 +44,25 @@ def load_model():
     model_path = os.path.join(Config.SAVED_MODELS_DIR, 'visual_classifier.keras')
     classes_path = os.path.join(Config.SAVED_MODELS_DIR, 'visual_classes.json')
 
+    if not os.path.exists(model_path):
+        raise ModelNotTrainedError(
+            'Visual classifier model not trained. Run: python ml/visual/train_visual.py'
+        )
+
     if os.path.exists(classes_path):
         with open(classes_path, 'r') as f:
             _cached_classes = json.load(f)
     else:
         _cached_classes = CATEGORIES
 
-    if os.path.exists(model_path):
-        from tensorflow import keras
-        try:
-            _cached_model = keras.models.load_model(model_path)
-            print('[visual_service] Loaded fine-tuned MobileNetV2 classifier.')
-            return _cached_model, _cached_classes
-        except Exception as e:
-            print(f'[visual_service] Error loading saved model: {e}. Falling back to base MobileNetV2.')
-
-    # Fallback: Load pretrained MobileNetV2 with ImageNet mapping
-    from tensorflow.keras.applications.mobilenet_v2 import MobileNetV2
-    print('[visual_service] Initializing pretrained MobileNetV2 feature network.')
-    _cached_model = MobileNetV2(weights='imagenet', input_shape=(224, 224, 3))
+    from tensorflow import keras
+    _cached_model = keras.models.load_model(model_path)
+    print(f'[visual_service] Loaded fine-tuned MobileNetV2 classifier with {len(_cached_classes)} classes.')
     return _cached_model, _cached_classes
 
 
 def preprocess_image(file_path):
+    """Identical preprocessing to training: convert to RGB, resize with bilinear interpolation to 224x224."""
     img = Image.open(file_path).convert('RGB')
     img = img.resize(TARGET_SIZE, Image.Resampling.BILINEAR)
     arr = np.array(img, dtype=np.float32)
@@ -70,39 +70,13 @@ def preprocess_image(file_path):
 
 
 def classify_image(file_path):
-    """Runs deep learning inference on the image and returns category predictions."""
+    """Runs genuine deep learning inference on the image and returns category predictions."""
     model, classes = load_model()
     img_tensor = preprocess_image(file_path)
 
-    # Check whether the model is our 6-class classifier or 1000-class ImageNet
-    if model.output_shape[-1] == len(classes):
-        probs = model.predict(img_tensor, verbose=0)[0]
-    else:
-        # Pretrained MobileNetV2 on ImageNet -> decode and aggregate to our e-commerce categories
-        from tensorflow.keras.applications.mobilenet_v2 import preprocess_input, decode_predictions
-        norm_img = preprocess_input(img_tensor.copy())
-        raw_preds = model.predict(norm_img, verbose=0)
-        decoded = decode_predictions(raw_preds, top=20)[0]
-
-        # Semantic cluster mapping from ImageNet synsets to 6 categories
-        category_weights = {c: 0.05 for c in classes}
-        for _, label, prob in decoded:
-            label_lower = label.lower()
-            if any(k in label_lower for k in ['shoe', 'boot', 'sandal', 'loafer', 'sneaker', 'clog']):
-                category_weights['Shoes'] += float(prob)
-            elif any(k in label_lower for k in ['shirt', 'jersey', 'suit', 'jacket', 'coat', 'jean', 'dress', 'cardigan', 'trench']):
-                category_weights['Shirts'] += float(prob)
-            elif any(k in label_lower for k in ['cellular', 'phone', 'computer', 'laptop', 'mouse', 'keyboard', 'screen', 'monitor', 'camera', 'ipod', 'television', 'radio']):
-                category_weights['Electronics'] += float(prob)
-            elif any(k in label_lower for k in ['watch', 'sunglasses', 'glasses', 'umbrella', 'wallet', 'necklace', 'buckle', 'whistle']):
-                category_weights['Accessories'] += float(prob)
-            elif any(k in label_lower for k in ['backpack', 'bag', 'purse', 'basket', 'luggage', 'sack']):
-                category_weights['Bags'] += float(prob)
-            else:
-                category_weights['Other'] += float(prob) * 0.5
-
-        total_weight = sum(category_weights.values())
-        probs = np.array([category_weights[c] / total_weight for c in classes])
+    # Genuine CNN inference output probabilities
+    probs = model.predict(img_tensor, verbose=0)[0]
+    probs = np.array(probs, dtype=float)
 
     top_indices = np.argsort(probs)[::-1]
     predicted_category = classes[top_indices[0]]
@@ -121,28 +95,28 @@ def classify_image(file_path):
     }
 
 
-def save_prediction(original_filename, stored_filename, file_path, result):
+def save_prediction(orig_name, unique_name, file_path, result):
     pred = ImagePrediction(
-        filename=stored_filename,
-        original_filename=original_filename,
+        filename=unique_name,
+        original_filename=orig_name,
         file_path=file_path,
-        image_url=f'/api/visual-recognition/images/{stored_filename}',
+        image_url=f'/api/visual-recognition/images/{unique_name}',
         predicted_category=result['predicted_category'],
         confidence=result['confidence'],
-        top3_json=json.dumps(result['top3']),
-        status='completed',
     )
+    pred.top3 = result['top3']
     db.session.add(pred)
     db.session.commit()
     return pred
 
 
-def get_prediction_history(page=1, per_page=10):
+def get_prediction_history(page=1, per_page=20):
     query = ImagePrediction.query.order_by(ImagePrediction.created_at.desc())
-    total = query.count()
-    items = query.offset((page - 1) * per_page).limit(per_page).all()
-    pages = max(1, (total + per_page - 1) // per_page)
+    pagination = query.paginate(page=page, per_page=per_page, error_out=False)
     return {
-        'items': [p.to_dict() for p in items],
-        'pagination': {'page': page, 'per_page': per_page, 'total': total, 'pages': pages},
+        'data': [p.to_dict() for p in pagination.items],
+        'total': pagination.total,
+        'page': page,
+        'per_page': per_page,
+        'pages': pagination.pages,
     }
