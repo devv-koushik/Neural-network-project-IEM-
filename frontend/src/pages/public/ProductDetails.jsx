@@ -10,11 +10,13 @@ import ProductCard from '../../components/products/ProductCard';
 import { getProduct } from '../../services/api';
 import { getRelatedProducts } from '../../data/products';
 import { useToast } from '../../hooks/useToast';
+import { useCart } from '../../hooks/useCart';
 
 export default function ProductDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
   const { showToast } = useToast();
+  const { addToCart, openCheckout } = useCart();
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -92,10 +94,22 @@ export default function ProductDetails() {
             </div>
 
             <div className="mt-6 flex flex-wrap gap-3">
-              <Button variant="secondary" icon={ShoppingCart} disabled={outOfStock} onClick={() => showToast(`${qty} × ${product.name} added to cart.`, 'success')} className="flex-1 sm:flex-none">
+              <Button
+                variant="secondary"
+                icon={ShoppingCart}
+                disabled={outOfStock}
+                onClick={() => addToCart(product, qty, true)}
+                className="flex-1 sm:flex-none"
+              >
                 Add to Cart
               </Button>
-              <Button variant="primary" icon={Zap} disabled={outOfStock} onClick={() => showToast('Redirecting to checkout...', 'info')} className="flex-1 sm:flex-none">
+              <Button
+                variant="primary"
+                icon={Zap}
+                disabled={outOfStock}
+                onClick={() => openCheckout({ product, quantity: qty })}
+                className="flex-1 sm:flex-none"
+              >
                 Buy Now
               </Button>
             </div>

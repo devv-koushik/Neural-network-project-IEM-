@@ -2,10 +2,10 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Star, ShoppingCart, Eye } from 'lucide-react';
 import Badge from '../common/Badge';
-import { useToast } from '../../hooks/useToast';
+import { useCart } from '../../hooks/useCart';
 
 export default function ProductCard({ product }) {
-  const { showToast } = useToast();
+  const { addToCart } = useCart();
   const [imgFailed, setImgFailed] = useState(false);
   const Icon = product.image;
   const outOfStock = product.stock === 0;
@@ -13,7 +13,7 @@ export default function ProductCard({ product }) {
   function handleAddToCart(e) {
     e.preventDefault();
     e.stopPropagation();
-    showToast(`${product.name} added to cart.`, 'success');
+    addToCart(product, 1, false);
   }
 
   const hasRealImage = Boolean(product.imageUrl && !imgFailed);

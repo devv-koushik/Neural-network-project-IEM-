@@ -6,6 +6,9 @@ import App from './App.jsx';
 import { ThemeProvider } from './context/ThemeContext.jsx';
 import { AuthProvider } from './context/AuthContext.jsx';
 import { ToastProvider } from './context/ToastContext.jsx';
+import { CartProvider } from './context/CartContext.jsx';
+import CartDrawer from './components/cart/CartDrawer.jsx';
+import CheckoutModal from './components/cart/CheckoutModal.jsx';
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
@@ -13,7 +16,11 @@ createRoot(document.getElementById('root')).render(
       <ThemeProvider>
         <ToastProvider>
           <AuthProvider>
-            <App />
+            <CartProvider>
+              <App />
+              <CartDrawer />
+              <CheckoutModal />
+            </CartProvider>
           </AuthProvider>
         </ToastProvider>
       </ThemeProvider>

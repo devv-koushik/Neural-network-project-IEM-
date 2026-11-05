@@ -1,10 +1,11 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Menu, X, LayoutDashboard, LogOut } from 'lucide-react';
+import { Menu, X, LayoutDashboard, LogOut, ShoppingCart } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import Button from '../common/Button';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
+import { useCart } from '../../hooks/useCart';
 
 const LINKS = [
   { to: '/', label: 'Home' },
@@ -16,6 +17,7 @@ export default function Navbar() {
   const [open, setOpen] = useState(false);
   const { user, logout } = useAuth();
   const { showToast } = useToast();
+  const { totalCount, openCart } = useCart();
   const navigate = useNavigate();
 
   async function handleLogout() {
@@ -70,6 +72,21 @@ export default function Navbar() {
         {/* Desktop actions */}
         <div className="hidden md:flex items-center gap-3">
           <ThemeToggle />
+
+          {/* Cart Icon Button */}
+          <button
+            onClick={openCart}
+            className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-ink-200 dark:border-ink-700 text-ink-600 dark:text-ink-200 hover:text-signal-500 hover:border-signal-500/40 transition-colors"
+            aria-label={`Shopping cart with ${totalCount} items`}
+          >
+            <ShoppingCart size={18} />
+            {totalCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-signal-500 px-1 text-[10px] font-bold text-white shadow-sm">
+                {totalCount}
+              </span>
+            )}
+          </button>
+
           {user ? (
             <>
               <Button variant="secondary" icon={LayoutDashboard} onClick={() => navigate(user.role === 'admin' ? '/admin' : '/dashboard')}>
@@ -92,14 +109,29 @@ export default function Navbar() {
           )}
         </div>
 
-        {/* Mobile hamburger */}
-        <button
-          className="md:hidden h-9 w-9 flex items-center justify-center rounded-xl border border-ink-200 dark:border-ink-700 text-ink-600 dark:text-ink-200"
-          onClick={() => setOpen(true)}
-          aria-label="Open menu"
-        >
-          <Menu size={20} />
-        </button>
+        {/* Mobile action bar */}
+        <div className="flex md:hidden items-center gap-2">
+          <button
+            onClick={openCart}
+            className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-ink-200 dark:border-ink-700 text-ink-600 dark:text-ink-200 hover:text-signal-500"
+            aria-label={`Shopping cart with ${totalCount} items`}
+          >
+            <ShoppingCart size={17} />
+            {totalCount > 0 && (
+              <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-signal-500 px-1 text-[10px] font-bold text-white">
+                {totalCount}
+              </span>
+            )}
+          </button>
+
+          <button
+            className="h-9 w-9 flex items-center justify-center rounded-xl border border-ink-200 dark:border-ink-700 text-ink-600 dark:text-ink-200"
+            onClick={() => setOpen(true)}
+            aria-label="Open menu"
+          >
+            <Menu size={20} />
+          </button>
+        </div>
       </div>
 
       {/* Mobile drawer */}

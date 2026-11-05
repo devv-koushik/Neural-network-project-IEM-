@@ -21,10 +21,7 @@ import AdminDashboard from './pages/admin/AdminDashboard';
 import CustomerAnalytics from './pages/admin/CustomerAnalytics';
 import AdminPurchasePrediction from './pages/admin/AdminPurchasePrediction';
 import AdminChurnPrediction from './pages/admin/AdminChurnPrediction';
-import ModelPerformance from './pages/admin/ModelPerformance';
-import ModelComparison from './pages/admin/ModelComparison';
 import HyperparameterTuning from './pages/admin/HyperparameterTuning';
-import TrainingAnalytics from './pages/admin/TrainingAnalytics';
 import ProductsManagement from './pages/admin/ProductsManagement';
 
 // Deep Learning & Generative AI feature pages (Modules 3, 4, 5)
@@ -58,10 +55,7 @@ export default function App() {
       <Route path="/admin/customers" element={<ProtectedRoute role="admin"><CustomerAnalytics /></ProtectedRoute>} />
       <Route path="/admin/purchase-prediction" element={<ProtectedRoute role="admin"><AdminPurchasePrediction /></ProtectedRoute>} />
       <Route path="/admin/churn-prediction" element={<ProtectedRoute role="admin"><AdminChurnPrediction /></ProtectedRoute>} />
-      <Route path="/admin/model-performance" element={<ProtectedRoute role="admin"><ModelPerformance /></ProtectedRoute>} />
-      <Route path="/admin/model-comparison" element={<ProtectedRoute role="admin"><ModelComparison /></ProtectedRoute>} />
       <Route path="/admin/hyperparameter-tuning" element={<ProtectedRoute role="admin"><HyperparameterTuning /></ProtectedRoute>} />
-      <Route path="/admin/training-analytics" element={<ProtectedRoute role="admin"><TrainingAnalytics /></ProtectedRoute>} />
       <Route path="/admin/products" element={<ProtectedRoute role="admin"><ProductsManagement /></ProtectedRoute>} />
 
       {/* Dedicated Module 3, 4, 5 Feature Tabs */}

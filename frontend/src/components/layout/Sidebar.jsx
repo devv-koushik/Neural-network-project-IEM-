@@ -1,7 +1,7 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, ShoppingBag, Brain, History, User, Users, TrendingUp,
-  AlertOctagon, Gauge, GitCompare, SlidersHorizontal, LineChart, Package,
+  AlertOctagon, SlidersHorizontal, Package,
   ScanEye, BarChart2, Database, Wand2,
   X, LogOut, Settings,
 } from 'lucide-react';
@@ -22,10 +22,7 @@ const ADMIN_LINKS = [
   { to: '/admin/customers',               label: 'Customers',             icon: Users },
   { to: '/admin/purchase-prediction',     label: 'Purchase Prediction',   icon: TrendingUp },
   { to: '/admin/churn-prediction',        label: 'Churn Prediction',      icon: AlertOctagon },
-  { to: '/admin/model-performance',       label: 'Model Performance',     icon: Gauge },
-  { to: '/admin/model-comparison',        label: 'Model Comparison',      icon: GitCompare },
   { to: '/admin/hyperparameter-tuning',   label: 'Hyperparameter Tuning', icon: SlidersHorizontal },
-  { to: '/admin/training-analytics',      label: 'Training Analytics',    icon: LineChart },
   { to: '/admin/products',                label: 'Products',              icon: Package },
   { to: '/admin/visual-recognition',      label: 'Visual Recognition',    icon: ScanEye },
   { to: '/admin/demand-forecasting',      label: 'Demand Forecasting',    icon: BarChart2 },
