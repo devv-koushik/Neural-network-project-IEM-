@@ -86,3 +86,4 @@ def sales_report():
         return ok(data)
     except Exception as e:
         return err(f'Sales report generation failed: {str(e)}', 'REPORT_FAILED', 500)
+

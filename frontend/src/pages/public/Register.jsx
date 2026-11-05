@@ -54,7 +54,7 @@ export default function Register() {
         <p className="mt-1.5 text-center text-sm text-ink-400">Start exploring AI-powered e-commerce insights</p>
 
         <form onSubmit={handleSubmit} className="mt-8 card p-6 space-y-4" noValidate>
-          <Input id="name" label="Full name" placeholder="Alex Rivera" value={form.name} onChange={(e) => update('name', e.target.value)} error={errors.name} autoComplete="name" />
+          <Input id="name" label="Full name" placeholder="Pritam Sharma" value={form.name} onChange={(e) => update('name', e.target.value)} error={errors.name} autoComplete="name" />
           <Input id="email" label="Email" type="email" placeholder="you@example.com" value={form.email} onChange={(e) => update('email', e.target.value)} error={errors.email} autoComplete="email" />
           <Input id="password" label="Password" type="password" placeholder="At least 6 characters" value={form.password} onChange={(e) => update('password', e.target.value)} error={errors.password} autoComplete="new-password" />
           <Input id="confirm" label="Confirm password" type="password" placeholder="Re-enter your password" value={form.confirm} onChange={(e) => update('confirm', e.target.value)} error={errors.confirm} autoComplete="new-password" />

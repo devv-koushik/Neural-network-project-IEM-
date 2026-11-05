@@ -78,7 +78,7 @@ def seed_core():
     rng = random.Random(42)
 
     print('Seeding demo users...')
-    customer_user = User(name='Alex Customer', email='customer@demo.com', role='customer')
+    customer_user = User(name='Pritam Customer', email='customer@demo.com', role='customer')
     customer_user.set_password('customer123')
     admin_user = User(name='Jordan Admin', email='admin@demo.com', role='admin')
     admin_user.set_password('admin123')

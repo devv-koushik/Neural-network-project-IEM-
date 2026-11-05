@@ -70,3 +70,4 @@ def status():
         'architecture': 'LSTM(64) -> LSTM(32) -> Dense(16) -> Dense(1)',
         'supported_horizons': [7, 30],
     })
+

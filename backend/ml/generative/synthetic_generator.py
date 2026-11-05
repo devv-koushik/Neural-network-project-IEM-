@@ -94,7 +94,7 @@ def generate_synthetic_tabular_data(source_df: pd.DataFrame, num_records: int = 
 
     # 3. Add identifiers and synthetic label
     if 'name' in source_df.columns:
-        first_names = ['Alex', 'Jordan', 'Taylor', 'Sam', 'Chris', 'Morgan', 'Casey', 'Riley', 'Avery', 'Devon']
+        first_names = ['Pritam', 'Jordan', 'Taylor', 'Sam', 'Chris', 'Morgan', 'Casey', 'Riley', 'Avery', 'Devon']
         last_names = ['Smith', 'Johnson', 'Williams', 'Brown', 'Jones', 'Miller', 'Davis', 'Wilson', 'Moore', 'Taylor']
         synthetic_dict['name'] = [f'{np.random.choice(first_names)} {np.random.choice(last_names)}' for _ in range(num_records)]
 

@@ -130,3 +130,4 @@ def generate_executive_sales_report():
         'metrics_snapshot': summary_data,
         'generated_at': datetime.now(timezone.utc).isoformat(),
     }
+
