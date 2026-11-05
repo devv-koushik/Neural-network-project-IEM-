@@ -17,7 +17,6 @@ import PredictionHistory from './pages/customer/PredictionHistory';
 import Profile from './pages/customer/Profile';
 
 // Admin pages
-import AdminDashboard from './pages/admin/AdminDashboard';
 import CustomerAnalytics from './pages/admin/CustomerAnalytics';
 import AdminPurchasePrediction from './pages/admin/AdminPurchasePrediction';
 import AdminChurnPrediction from './pages/admin/AdminChurnPrediction';
@@ -51,7 +50,7 @@ export default function App() {
       <Route path="/profile" element={<ProtectedRoute role="customer"><Profile /></ProtectedRoute>} />
 
       {/* Admin — Core Management & Analytics */}
-      <Route path="/admin" element={<ProtectedRoute role="admin"><AdminDashboard /></ProtectedRoute>} />
+      <Route path="/admin" element={<Navigate to="/admin/customers" replace />} />
       <Route path="/admin/customers" element={<ProtectedRoute role="admin"><CustomerAnalytics /></ProtectedRoute>} />
       <Route path="/admin/purchase-prediction" element={<ProtectedRoute role="admin"><AdminPurchasePrediction /></ProtectedRoute>} />
       <Route path="/admin/churn-prediction" element={<ProtectedRoute role="admin"><AdminChurnPrediction /></ProtectedRoute>} />

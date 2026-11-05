@@ -18,7 +18,6 @@ const CUSTOMER_LINKS = [
 ];
 
 const ADMIN_LINKS = [
-  { to: '/admin',                         label: 'Dashboard',             icon: LayoutDashboard, end: true },
   { to: '/admin/customers',               label: 'Customers',             icon: Users },
   { to: '/admin/purchase-prediction',     label: 'Purchase Prediction',   icon: TrendingUp },
   { to: '/admin/churn-prediction',        label: 'Churn Prediction',      icon: AlertOctagon },
