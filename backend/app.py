@@ -54,6 +54,9 @@ def create_app():
     from routes.models import bp as models_bp
     from routes.experiments import bp as experiments_bp
     from routes.training import bp as training_bp
+    from routes.visual_recognition import bp as visual_bp
+    from routes.forecasting import bp as forecasting_bp
+    from routes.generative import bp as generative_bp
 
     app.register_blueprint(auth_bp)
     app.register_blueprint(customers_bp)
@@ -63,15 +66,27 @@ def create_app():
     app.register_blueprint(models_bp)
     app.register_blueprint(experiments_bp)
     app.register_blueprint(training_bp)
+    app.register_blueprint(visual_bp)
+    app.register_blueprint(forecasting_bp)
+    app.register_blueprint(generative_bp)
 
     @app.get('/api/health')
     def health():
         from services.prediction_service import models_available
+        from services.forecasting_service import load_forecasting_artifacts
+        lstm_model, _ = load_forecasting_artifacts()
         return jsonify({
             'success': True,
             'data': {
                 'status': 'ok',
                 'models_trained': models_available(),
+                'modules': {
+                    'module1_sales_customer': {'status': 'ready' if models_available() else 'pending'},
+                    'module2_optimization': {'status': 'ready'},
+                    'module3_visual_recognition': {'status': 'ready', 'engine': 'MobileNetV2 Transfer Learning'},
+                    'module4_demand_forecasting': {'status': 'ready' if lstm_model is not None else 'ready_baseline', 'engine': 'LSTM Time-Series'},
+                    'module5_generative_ai': {'status': 'ready', 'engines': ['KS-Synthetic-Data', 'Neural-Copywriter']},
+                },
             },
         })
 

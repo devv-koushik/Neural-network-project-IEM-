@@ -1,5 +1,5 @@
-import { useState } from 'react';
-import { Camera, Save, Bell, Shield, User } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { Camera, Save, Bell, Shield, User, Lock } from 'lucide-react';
 import { DashboardLayout } from '../../components/layout/Layout';
 import Card from '../../components/common/Card';
 import Input from '../../components/common/Input';
@@ -7,27 +7,98 @@ import Button from '../../components/common/Button';
 import Badge from '../../components/common/Badge';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
+import { getCurrentUser, updateProfile, changePassword } from '../../services/api';
+
+function formatMemberSince(isoDate) {
+  if (!isoDate) return '—';
+  try {
+    return new Date(isoDate).toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  } catch {
+    return '—';
+  }
+}
 
 export default function Profile() {
-  const { user } = useAuth();
+  const { user, setUser } = useAuth();
   const { showToast } = useToast();
+
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
   const [notifications, setNotifications] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  function handleSave(e) {
+  // Real user stats fetched from /api/auth/me
+  const [memberSince, setMemberSince] = useState(null);
+  const [totalPredictions, setTotalPredictions] = useState(null);
+  const [latestPrediction, setLatestPrediction] = useState(null);
+
+  // Password change state
+  const [showPassword, setShowPassword] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState('');
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [changingPassword, setChangingPassword] = useState(false);
+
+  useEffect(() => {
+    getCurrentUser()
+      .then((u) => {
+        setName(u.name || '');
+        setEmail(u.email || '');
+        setMemberSince(u.created_at || null);
+        setTotalPredictions(u.total_predictions ?? null);
+        setLatestPrediction(u.latest_prediction || null);
+      })
+      .catch(() => {
+        // Backend unavailable — keep values from auth context
+        setMemberSince(user?.created_at || null);
+      });
+  }, []);
+
+  async function handleSave(e) {
     e.preventDefault();
     setSaving(true);
-    setTimeout(() => {
+    try {
+      const updatedUser = await updateProfile({ name, email });
+      if (setUser) setUser((prev) => ({ ...prev, name: updatedUser.name, email: updatedUser.email }));
+      showToast('Profile updated successfully.', 'success');
+    } catch (error) {
+      const msg = error?.response?.data?.error?.message || 'Failed to update profile.';
+      showToast(msg, 'error');
+    } finally {
       setSaving(false);
-      showToast('Profile updated.', 'success');
-    }, 700);
+    }
+  }
+
+  async function handlePasswordChange(e) {
+    e.preventDefault();
+    if (newPassword !== confirmPassword) {
+      showToast('New passwords do not match.', 'error');
+      return;
+    }
+    if (newPassword.length < 6) {
+      showToast('Password must be at least 6 characters.', 'error');
+      return;
+    }
+    setChangingPassword(true);
+    try {
+      await changePassword({ currentPassword, newPassword });
+      showToast('Password changed successfully.', 'success');
+      setCurrentPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      setShowPassword(false);
+    } catch (error) {
+      const msg = error?.response?.data?.error?.message || 'Failed to change password.';
+      showToast(msg, 'error');
+    } finally {
+      setChangingPassword(false);
+    }
   }
 
   return (
     <DashboardLayout role="customer" title="Profile" subtitle="Manage your account details">
       <div className="grid grid-cols-1 gap-5 lg:grid-cols-3">
+        {/* ── Sidebar card ── */}
         <Card className="p-6 flex flex-col items-center text-center lg:col-span-1 h-fit">
           <div className="relative">
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-signal-500 text-2xl font-bold text-white">
@@ -43,16 +114,37 @@ export default function Profile() {
           <div className="mt-6 w-full space-y-3 text-left">
             <div className="flex items-center justify-between text-sm">
               <span className="text-ink-400">Member since</span>
-              <span className="font-medium text-ink-700 dark:text-ink-200">Mar 2024</span>
+              <span className="font-medium text-ink-700 dark:text-ink-200">
+                {memberSince ? formatMemberSince(memberSince) : '—'}
+              </span>
             </div>
             <div className="flex items-center justify-between text-sm">
               <span className="text-ink-400">Total predictions</span>
-              <span className="font-medium text-ink-700 dark:text-ink-200">14</span>
+              <span className="font-medium text-ink-700 dark:text-ink-200">
+                {totalPredictions !== null ? totalPredictions : '—'}
+              </span>
             </div>
+            {latestPrediction && (
+              <>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-ink-400">Purchase probability</span>
+                  <span className="font-medium text-ink-700 dark:text-ink-200">
+                    {(latestPrediction.purchase_probability * 100).toFixed(1)}%
+                  </span>
+                </div>
+                <div className="flex items-center justify-between text-sm">
+                  <span className="text-ink-400">Churn risk</span>
+                  <span className="font-medium text-ink-700 dark:text-ink-200">
+                    {latestPrediction.churn_risk}
+                  </span>
+                </div>
+              </>
+            )}
           </div>
         </Card>
 
         <div className="lg:col-span-2 space-y-5">
+          {/* ── Account details ── */}
           <Card className="p-6">
             <div className="flex items-center gap-2 mb-5"><User size={16} className="text-signal-500" /><h3 className="font-display text-sm font-semibold text-ink-800 dark:text-white">Account details</h3></div>
             <form onSubmit={handleSave} className="space-y-4">
@@ -64,6 +156,7 @@ export default function Profile() {
             </form>
           </Card>
 
+          {/* ── Preferences ── */}
           <Card className="p-6">
             <div className="flex items-center gap-2 mb-5"><Bell size={16} className="text-amber-500" /><h3 className="font-display text-sm font-semibold text-ink-800 dark:text-white">Preferences</h3></div>
             <div className="flex items-center justify-between">
@@ -82,10 +175,51 @@ export default function Profile() {
             </div>
           </Card>
 
+          {/* ── Security / Change password ── */}
           <Card className="p-6">
-            <div className="flex items-center gap-2 mb-2"><Shield size={16} className="text-mint-500" /><h3 className="font-display text-sm font-semibold text-ink-800 dark:text-white">Security</h3></div>
-            <p className="text-xs text-ink-400 mb-4">Demo accounts do not support password changes.</p>
-            <Button variant="secondary" disabled>Change password</Button>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2"><Shield size={16} className="text-mint-500" /><h3 className="font-display text-sm font-semibold text-ink-800 dark:text-white">Security</h3></div>
+              {!showPassword && (
+                <Button variant="secondary" icon={Lock} onClick={() => setShowPassword(true)}>Change password</Button>
+              )}
+            </div>
+
+            {showPassword ? (
+              <form onSubmit={handlePasswordChange} className="space-y-4">
+                <Input
+                  id="current-password"
+                  label="Current password"
+                  type="password"
+                  value={currentPassword}
+                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  required
+                />
+                <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                  <Input
+                    id="new-password"
+                    label="New password"
+                    type="password"
+                    value={newPassword}
+                    onChange={(e) => setNewPassword(e.target.value)}
+                    required
+                  />
+                  <Input
+                    id="confirm-password"
+                    label="Confirm new password"
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                    required
+                  />
+                </div>
+                <div className="flex gap-3">
+                  <Button type="submit" variant="primary" loading={changingPassword}>Update password</Button>
+                  <Button type="button" variant="secondary" onClick={() => { setShowPassword(false); setCurrentPassword(''); setNewPassword(''); setConfirmPassword(''); }}>Cancel</Button>
+                </div>
+              </form>
+            ) : (
+              <p className="text-xs text-ink-400">Keep your account secure with a strong password.</p>
+            )}
           </Card>
         </div>
       </div>

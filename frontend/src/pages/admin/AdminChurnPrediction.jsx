@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Eye, Search as SearchIcon, BrainCircuit } from 'lucide-react';
 import { DashboardLayout } from '../../components/layout/Layout';
@@ -14,6 +15,7 @@ import { getCustomers, getCustomerAnalytics } from '../../services/api';
 import { AlertOctagon, AlertTriangle, ShieldCheck } from 'lucide-react';
 
 export default function AdminChurnPrediction() {
+  const navigate = useNavigate();
   const [customers, setCustomers] = useState([]);
   const [analytics, setAnalytics] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -90,7 +92,17 @@ export default function AdminChurnPrediction() {
               <div className="rounded-lg bg-ink-50 dark:bg-ink-850 p-3"><p className="text-xs text-ink-400">Purchases</p><p className="font-semibold text-ink-800 dark:text-white">{selected.purchases}</p></div>
               <div className="rounded-lg bg-ink-50 dark:bg-ink-850 p-3"><p className="text-xs text-ink-400">CLV</p><p className="font-semibold text-ink-800 dark:text-white">${selected.clv}</p></div>
             </div>
-            <Button variant="primary" icon={BrainCircuit} className="mt-5 w-full">Analyze in detail</Button>
+            <Button
+              variant="primary"
+              icon={BrainCircuit}
+              className="mt-5 w-full"
+              onClick={() => {
+                setSelected(null);
+                navigate('/admin/customers');
+              }}
+            >
+              Analyze in detail
+            </Button>
           </div>
         )}
       </Modal>

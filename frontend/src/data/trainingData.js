@@ -1,5 +1,6 @@
 // Mock per-experiment training history for the Training Analytics page.
-// Replace with GET /api/training/history?experiment=... when backend is connected.
+// Keys match the EXACT experiment names returned by the backend
+// (GET /api/models/experiment-names → model_experiments table).
 
 function buildHistory(seedAcc, seedLoss, epochs = 15) {
   const history = [];
@@ -23,12 +24,15 @@ function buildHistory(seedAcc, seedLoss, epochs = 15) {
   return history;
 }
 
+// Keys match EXACTLY the names stored in the model_experiments table
+// by train_optimized.py: 'Basic ANN', 'Dropout', 'L2 Regularization',
+// 'Batch Normalization', 'Optimized Model'.
 export const TRAINING_HISTORY = {
-  'Basic ANN': buildHistory({ start: 0.55, step: 0.09, cap: 0.86 }, { start: 1.05, step: 0.16, floor: 0.46 }),
-  Dropout: buildHistory({ start: 0.53, step: 0.085, cap: 0.87 }, { start: 1.08, step: 0.15, floor: 0.42 }),
-  L2: buildHistory({ start: 0.54, step: 0.086, cap: 0.865 }, { start: 1.06, step: 0.153, floor: 0.43 }),
-  BatchNorm: buildHistory({ start: 0.58, step: 0.1, cap: 0.885 }, { start: 0.98, step: 0.17, floor: 0.39 }),
-  Optimized: buildHistory({ start: 0.6, step: 0.11, cap: 0.905 }, { start: 0.92, step: 0.185, floor: 0.34 }),
+  'Basic ANN':          buildHistory({ start: 0.55, step: 0.09, cap: 0.86  }, { start: 1.05, step: 0.16,  floor: 0.46 }),
+  'Dropout':            buildHistory({ start: 0.53, step: 0.085, cap: 0.87 }, { start: 1.08, step: 0.15,  floor: 0.42 }),
+  'L2 Regularization':  buildHistory({ start: 0.54, step: 0.086, cap: 0.865}, { start: 1.06, step: 0.153, floor: 0.43 }),
+  'Batch Normalization':buildHistory({ start: 0.58, step: 0.1,  cap: 0.885 }, { start: 0.98, step: 0.17,  floor: 0.39 }),
+  'Optimized Model':    buildHistory({ start: 0.60, step: 0.11, cap: 0.905 }, { start: 0.92, step: 0.185, floor: 0.34 }),
 };
 
 export const EXPERIMENT_NAMES = Object.keys(TRAINING_HISTORY);

@@ -54,9 +54,17 @@ def train():
 
 @bp.get('/tensorboard')
 def tensorboard_info():
+    import os
+    from config import Config
+    has_logs = os.path.exists(Config.LOGS_DIR) and len(os.listdir(Config.LOGS_DIR)) > 0
+    runs = []
+    if os.path.exists(Config.LOGS_DIR):
+        runs = [d for d in os.listdir(Config.LOGS_DIR) if os.path.isdir(os.path.join(Config.LOGS_DIR, d))]
     return ok({
-        'available': False,
-        'instructions': 'TensorBoard is not embedded in the API. From the backend/ folder, run: tensorboard --logdir logs',
+        'available': has_logs,
+        'logs_dir': Config.LOGS_DIR,
+        'runs_found': runs,
+        'instructions': 'TensorBoard event logs are active. View them in your browser by running: tensorboard --logdir logs',
         'default_url': 'http://localhost:6006',
         'log_dirs': ['basic_model', 'dropout_model', 'l2_model', 'batchnorm_model', 'optimized_model'],
     })

@@ -19,3 +19,5 @@ scikit-learn==1.9.0
 pandas==3.0.5
 joblib==1.5.3
 tensorboard==2.16.2
+Pillow>=10.0.0
+pytest>=8.0.0

@@ -132,6 +132,24 @@ export async function logoutUser() {
   }
 }
 
+export async function getCurrentUser() {
+  const { data } = await apiClient.get('/auth/me');
+  return data.data.user;
+}
+
+export async function updateProfile({ name, email }) {
+  const { data } = await apiClient.put('/auth/profile', { name, email });
+  return data.data.user;
+}
+
+export async function changePassword({ currentPassword, newPassword }) {
+  const { data } = await apiClient.put('/auth/password', {
+    current_password: currentPassword,
+    new_password: newPassword,
+  });
+  return data.data;
+}
+
 // ----------------------------- PRODUCTS -----------------------------
 export async function getProducts() {
   try {
@@ -446,5 +464,83 @@ export async function runExperiment(params) {
 
 export async function trainModels(scope = 'basic') {
   const { data } = await apiClient.post('/training/train', { scope });
+  return data.data;
+}
+
+// ----------------------------- MODULE 3: VISUAL RECOGNITION -----------------------------
+export async function predictVisualImage(file) {
+  const formData = new FormData();
+  formData.append('image', file);
+  const { data } = await apiClient.post('/visual-recognition/predict', formData, {
+    headers: { 'Content-Type': 'multipart/form-data' },
+  });
+  return data.data;
+}
+
+export async function getVisualHistory(page = 1, limit = 10) {
+  const { data } = await apiClient.get('/visual-recognition/history', { params: { page, limit } });
+  return data.data;
+}
+
+export async function getVisualStatus() {
+  const { data } = await apiClient.get('/visual-recognition/status');
+  return data.data;
+}
+
+// ----------------------------- MODULE 4: DEMAND FORECASTING -----------------------------
+export async function getForecastingProducts() {
+  const { data } = await apiClient.get('/forecasting/products');
+  return data.data;
+}
+
+export async function predictDemandForecast({ productName, forecastDays = 7 }) {
+  const { data } = await apiClient.post('/forecasting/predict', {
+    product_name: productName,
+    forecast_days: forecastDays,
+  });
+  return data.data;
+}
+
+export async function getForecastingHistory(page = 1, limit = 10) {
+  const { data } = await apiClient.get('/forecasting/history', { params: { page, limit } });
+  return data.data;
+}
+
+export async function trainForecastingModel(epochs = 15) {
+  const { data } = await apiClient.post('/forecasting/train', { epochs });
+  return data.data;
+}
+
+// ----------------------------- MODULE 5: GENERATIVE AI -----------------------------
+export async function generateSyntheticData({ source = 'customers', numRecords = 100 }) {
+  const { data } = await apiClient.post('/generative/synthetic-data/generate', {
+    source,
+    num_records: numRecords,
+  });
+  return data.data;
+}
+
+export async function getSyntheticDataHistory(page = 1, limit = 10) {
+  const { data } = await apiClient.get('/generative/synthetic-data/history', { params: { page, limit } });
+  return data.data;
+}
+
+export async function generateProductDescription({ productName, category, price, specifications }) {
+  const { data } = await apiClient.post('/generative/product-description', {
+    product_name: productName,
+    category,
+    price: Number(price),
+    specifications,
+  });
+  return data.data;
+}
+
+export async function getDescriptionHistory(page = 1, limit = 10) {
+  const { data } = await apiClient.get('/generative/product-description/history', { params: { page, limit } });
+  return data.data;
+}
+
+export async function generateSalesReport() {
+  const { data } = await apiClient.post('/generative/sales-report');
   return data.data;
 }
