@@ -53,8 +53,18 @@ export default function ProductDetails() {
         </nav>
 
         <div className="grid grid-cols-1 gap-10 lg:grid-cols-2">
-          <div className="flex h-80 items-center justify-center rounded-2xl sm:h-[420px]" style={{ background: `linear-gradient(135deg, ${product.color}18, ${product.color}05)` }}>
-            <Icon size={140} strokeWidth={1.2} style={{ color: product.color }} />
+          <div className="relative flex h-80 items-center justify-center overflow-hidden rounded-2xl sm:h-[420px] bg-ink-50 dark:bg-ink-900/40 border border-ink-100 dark:border-ink-800">
+            {product.imageUrl ? (
+              <img
+                src={product.imageUrl}
+                alt={product.name}
+                className="h-full w-full object-cover object-center"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center" style={{ background: `linear-gradient(135deg, ${product.color}18, ${product.color}05)` }}>
+                {Icon && <Icon size={140} strokeWidth={1.2} style={{ color: product.color }} />}
+              </div>
+            )}
           </div>
 
           <div>

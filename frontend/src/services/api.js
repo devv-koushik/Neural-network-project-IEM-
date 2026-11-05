@@ -65,6 +65,35 @@ const NAME_ICON_HINTS = [
   [/sunglasses|glasses/i, Glasses], [/controller|gamepad/i, Gamepad2], [/backpack/i, Backpack],
 ];
 
+const DATASET_PRODUCT_IMAGES = {
+  'Aurora Wireless ANC Headphones': '/dataset/Electronics/electronics_001.jpg',
+  'Pulse Fitness Smartwatch': '/dataset/Electronics/electronics_002.jpg',
+  'Nimbus Merino Wool Sweater': '/dataset/Shirts/shirts_001.jpg',
+  'Strato Trail Running Shoes': '/dataset/Shoes/shoes_001.jpg',
+  'Voyage Leather Backpack': '/dataset/Bags/bags_001.jpg',
+  'Haven Bouclé Accent Chair': '/dataset/Other/other_001.jpg',
+  'Haven Boucle Accent Chair': '/dataset/Other/other_001.jpg',
+  'Lumen Vitamin C Serum': '/dataset/Other/other_002.jpg',
+  'Halo 5G Smartphone': '/dataset/Electronics/electronics_003.jpg',
+  'Aperture Mirrorless Camera': '/dataset/Electronics/electronics_005.jpg',
+  'Compile 14" Ultrabook': '/dataset/Electronics/electronics_004.jpg',
+  'Meridian Polarized Sunglasses': '/dataset/Accessories/accessories_003.jpg',
+  'Sequence Pro Controller': '/dataset/Electronics/electronics_006.jpg',
+  'Drift Canvas Sneakers': '/dataset/Shoes/shoes_002.jpg',
+  'Solace Weighted Blanket': '/dataset/Other/other_005.jpg',
+  'Quartz Mineral Sunscreen': '/dataset/Other/other_004.jpg',
+  'Alpine Tailored Wool Coat': '/dataset/Shirts/shirts_002.jpg',
+};
+
+const CATEGORY_DATASET_DEFAULTS = {
+  Electronics: '/dataset/Electronics/electronics_001.jpg',
+  Shoes: '/dataset/Shoes/shoes_001.jpg',
+  Fashion: '/dataset/Shirts/shirts_001.jpg',
+  Accessories: '/dataset/Accessories/accessories_003.jpg',
+  Home: '/dataset/Other/other_001.jpg',
+  Beauty: '/dataset/Other/other_002.jpg',
+};
+
 function iconForProduct(p) {
   const hint = NAME_ICON_HINTS.find(([re]) => re.test(p.name || ''));
   if (hint) return hint[1];
@@ -72,6 +101,13 @@ function iconForProduct(p) {
 }
 
 function mapProduct(p) {
+  const resolvedImage =
+    p.image_url ||
+    p.imageUrl ||
+    DATASET_PRODUCT_IMAGES[p.name] ||
+    CATEGORY_DATASET_DEFAULTS[p.category] ||
+    null;
+
   return {
     id: String(p.id),
     name: p.name,
@@ -81,10 +117,11 @@ function mapProduct(p) {
     reviews: p.reviews,
     stock: p.stock,
     image: iconForProduct(p),
+    imageUrl: resolvedImage,
     color: p.color || '#5B6EF5',
     description: p.description,
     featured: !!p.featured,
-    tags: [],
+    tags: p.tags || [],
   };
 }
 

@@ -13,7 +13,7 @@ On startup this:
      they don't, WITHOUT automatically starting an expensive training run.
 """
 import os
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_from_directory
 from flask_cors import CORS
 from flask_jwt_extended import JWTManager
 
@@ -89,6 +89,11 @@ def create_app():
                 },
             },
         })
+
+    @app.get('/dataset/<path:filename>')
+    def serve_dataset_media(filename):
+        dataset_dir = os.path.join(Config.BASE_DIR, 'ml', 'visual', 'dataset', 'raw')
+        return send_from_directory(dataset_dir, filename)
 
     # ---- Consistent error envelope for uncaught errors ----
     @app.errorhandler(404)

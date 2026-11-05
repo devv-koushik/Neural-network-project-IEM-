@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Star, ShoppingCart, Eye } from 'lucide-react';
 import Badge from '../common/Badge';
@@ -5,6 +6,7 @@ import { useToast } from '../../hooks/useToast';
 
 export default function ProductCard({ product }) {
   const { showToast } = useToast();
+  const [imgFailed, setImgFailed] = useState(false);
   const Icon = product.image;
   const outOfStock = product.stock === 0;
 
@@ -14,12 +16,29 @@ export default function ProductCard({ product }) {
     showToast(`${product.name} added to cart.`, 'success');
   }
 
+  const hasRealImage = Boolean(product.imageUrl && !imgFailed);
+
   return (
     <Link to={`/products/${product.id}`} className="card card-hover group flex flex-col overflow-hidden">
-      <div className="relative flex h-44 items-center justify-center overflow-hidden" style={{ background: `linear-gradient(135deg, ${product.color}14, ${product.color}05)` }}>
-        <Icon size={56} strokeWidth={1.4} style={{ color: product.color }} className="transition-transform duration-300 group-hover:scale-110" />
-        {product.featured && <Badge tone="signal" className="absolute left-3 top-3">Featured</Badge>}
-        {outOfStock && <Badge tone="coral" className="absolute right-3 top-3">Out of stock</Badge>}
+      <div className="relative flex h-48 w-full items-center justify-center overflow-hidden bg-ink-50 dark:bg-ink-900/40">
+        {hasRealImage ? (
+          <img
+            src={product.imageUrl}
+            alt={product.name}
+            onError={() => setImgFailed(true)}
+            className="h-full w-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
+            loading="lazy"
+          />
+        ) : (
+          <div
+            className="flex h-full w-full items-center justify-center"
+            style={{ background: `linear-gradient(135deg, ${product.color}14, ${product.color}05)` }}
+          >
+            {Icon && <Icon size={56} strokeWidth={1.4} style={{ color: product.color }} className="transition-transform duration-300 group-hover:scale-110" />}
+          </div>
+        )}
+        {product.featured && <Badge tone="signal" className="absolute left-3 top-3 shadow-sm backdrop-blur-sm">Featured</Badge>}
+        {outOfStock && <Badge tone="coral" className="absolute right-3 top-3 shadow-sm backdrop-blur-sm">Out of stock</Badge>}
       </div>
       <div className="flex flex-1 flex-col p-4">
         <p className="text-xs font-medium text-ink-400">{product.category}</p>

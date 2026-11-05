@@ -162,7 +162,14 @@ export default function ProductsManagement() {
               <tbody>
                 {filtered.map((p) => (
                   <tr key={p.id} className="border-b border-ink-50 dark:border-ink-800/60">
-                    <td className="px-3 py-3 font-medium text-ink-800 dark:text-white max-w-xs truncate">{p.name}</td>
+                    <td className="px-3 py-3 font-medium text-ink-800 dark:text-white max-w-xs truncate">
+                      <div className="flex items-center gap-3">
+                        {p.imageUrl ? (
+                          <img src={p.imageUrl} alt={p.name} className="h-9 w-9 rounded-lg object-cover flex-shrink-0 border border-ink-100 dark:border-ink-800" />
+                        ) : null}
+                        <span className="truncate">{p.name}</span>
+                      </div>
+                    </td>
                     <td className="px-3 py-3 text-ink-500 dark:text-ink-300">{p.category}</td>
                     <td className="px-3 py-3 text-ink-600 dark:text-ink-200">${Number(p.price).toFixed(2)}</td>
                     <td className="px-3 py-3">{p.stock === 0 ? <Badge tone="coral">Out of stock</Badge> : <Badge tone="mint">{p.stock} in stock</Badge>}</td>
