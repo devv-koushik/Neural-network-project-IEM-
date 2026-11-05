@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { useLocation, useNavigate } from 'react-router-dom';
 import {
   Wand2,
   Database,
@@ -27,9 +28,24 @@ import {
   generateSalesReport,
 } from '../../services/api';
 
-export default function GenerativeAI() {
+export default function GenerativeAI({ initialTab }) {
   const { showToast } = useToast();
-  const [activeTab, setActiveTab] = useState('synthetic'); // 'synthetic' | 'content'
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const getTargetTab = () => {
+    if (initialTab) return initialTab;
+    if (location.pathname.includes('content') || location.pathname.includes('report') || location.pathname.includes('description')) {
+      return 'content';
+    }
+    return 'synthetic';
+  };
+
+  const [activeTab, setActiveTab] = useState(getTargetTab);
+
+  useEffect(() => {
+    setActiveTab(getTargetTab());
+  }, [location.pathname, initialTab]);
 
   // --- Feature A: Synthetic Data State ---
   const [synSource, setSynSource] = useState('customers');
@@ -130,13 +146,20 @@ export default function GenerativeAI() {
   return (
     <DashboardLayout
       role="admin"
-      title="Synthetic Data & AI Content Generation"
-      subtitle="Module 5 — Generative models for tabular dataset synthesis and neural marketing copy generation"
+      title={activeTab === 'synthetic' ? 'Synthetic Tabular Data Generator' : 'AI Content & Executive Reports'}
+      subtitle={
+        activeTab === 'synthetic'
+          ? 'Module 5A — Tabular Variational Autoencoder (VAE) dataset synthesis with Kolmogorov-Smirnov and correlation evaluation'
+          : 'Module 5B — Grounded neural marketing copywriter and live database sales narrative generator'
+      }
     >
       {/* Navigation Tabs */}
       <div className="flex border-b border-ink-100 dark:border-ink-800 mb-6 gap-6">
         <button
-          onClick={() => setActiveTab('synthetic')}
+          onClick={() => {
+            setActiveTab('synthetic');
+            if (location.pathname.includes('content')) navigate('/admin/synthetic-data');
+          }}
           className={`flex items-center gap-2 pb-3 text-sm font-semibold border-b-2 transition-all ${
             activeTab === 'synthetic'
               ? 'border-signal-500 text-signal-600 dark:text-signal-400'
@@ -144,10 +167,13 @@ export default function GenerativeAI() {
           }`}
         >
           <Database size={16} />
-          <span>Part A: Synthetic Tabular Data</span>
+          <span>Synthetic Tabular Data</span>
         </button>
         <button
-          onClick={() => setActiveTab('content')}
+          onClick={() => {
+            setActiveTab('content');
+            if (location.pathname.includes('synthetic')) navigate('/admin/ai-content');
+          }}
           className={`flex items-center gap-2 pb-3 text-sm font-semibold border-b-2 transition-all ${
             activeTab === 'content'
               ? 'border-signal-500 text-signal-600 dark:text-signal-400'
@@ -155,7 +181,7 @@ export default function GenerativeAI() {
           }`}
         >
           <Wand2 size={16} />
-          <span>Part B: AI Product Copy & Sales Insights</span>
+          <span>AI Content & Reports</span>
         </button>
       </div>
 

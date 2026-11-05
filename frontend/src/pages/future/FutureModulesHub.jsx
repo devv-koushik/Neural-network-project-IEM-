@@ -6,7 +6,7 @@ import Badge from '../../components/common/Badge';
 
 const MODULES = [
   {
-    to: '/admin/future-modules/visual-recognition',
+    to: '/admin/visual-recognition',
     icon: ScanEye,
     name: 'Module 3',
     title: 'Visual Product Recognition',
@@ -14,7 +14,7 @@ const MODULES = [
     tone: 'mint',
   },
   {
-    to: '/admin/future-modules/demand-forecasting',
+    to: '/admin/demand-forecasting',
     icon: LineChart,
     name: 'Module 4',
     title: 'Demand & Sales Forecasting',
@@ -22,7 +22,7 @@ const MODULES = [
     tone: 'mint',
   },
   {
-    to: '/admin/future-modules/generative-ai',
+    to: '/admin/synthetic-data',
     icon: Wand2,
     name: 'Module 5',
     title: 'Synthetic Data & AI Content',

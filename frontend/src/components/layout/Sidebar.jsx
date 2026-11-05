@@ -1,7 +1,8 @@
 import { NavLink, useNavigate } from 'react-router-dom';
 import {
   LayoutDashboard, ShoppingBag, Brain, History, User, Users, TrendingUp,
-  AlertOctagon, Gauge, GitCompare, SlidersHorizontal, LineChart, Package, Rocket,
+  AlertOctagon, Gauge, GitCompare, SlidersHorizontal, LineChart, Package,
+  ScanEye, BarChart2, Database, Wand2,
   X, LogOut, Settings,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
@@ -12,6 +13,7 @@ const CUSTOMER_LINKS = [
   { to: '/customer/products',  label: 'Products',           icon: ShoppingBag },
   { to: '/predict',            label: 'AI Prediction',       icon: Brain },
   { to: '/predict/history',    label: 'Prediction History',  icon: History },
+  { to: '/visual-recognition', label: 'Visual Recognition',  icon: ScanEye },
   { to: '/profile',            label: 'Profile',             icon: User },
 ];
 
@@ -25,7 +27,10 @@ const ADMIN_LINKS = [
   { to: '/admin/hyperparameter-tuning',   label: 'Hyperparameter Tuning', icon: SlidersHorizontal },
   { to: '/admin/training-analytics',      label: 'Training Analytics',    icon: LineChart },
   { to: '/admin/products',                label: 'Products',              icon: Package },
-  { to: '/admin/future-modules',          label: 'Future Modules',        icon: Rocket },
+  { to: '/admin/visual-recognition',      label: 'Visual Recognition',    icon: ScanEye },
+  { to: '/admin/demand-forecasting',      label: 'Demand Forecasting',    icon: BarChart2 },
+  { to: '/admin/synthetic-data',          label: 'Synthetic Data',        icon: Database },
+  { to: '/admin/ai-content',              label: 'AI Content Generation', icon: Wand2 },
 ];
 
 export default function Sidebar({ role = 'customer', mobileOpen = false, onClose }) {

@@ -18,7 +18,7 @@ const CATEGORY_COLORS = {
   Other: 'neutral',
 };
 
-export default function VisualRecognition() {
+export default function VisualRecognition({ role = 'admin' }) {
   const { showToast } = useToast();
   const fileInputRef = useRef(null);
 
@@ -93,7 +93,7 @@ export default function VisualRecognition() {
 
   return (
     <DashboardLayout
-      role="admin"
+      role={role}
       title="Visual Product Recognition"
       subtitle="Classify uploaded product images in real-time using MobileNetV2 Deep Learning"
     >

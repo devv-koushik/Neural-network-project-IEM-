@@ -1,4 +1,4 @@
-import { Routes, Route } from 'react-router-dom';
+import { Routes, Route, Navigate } from 'react-router-dom';
 import ProtectedRoute from './routes/ProtectedRoute';
 
 // Public pages
@@ -27,8 +27,7 @@ import HyperparameterTuning from './pages/admin/HyperparameterTuning';
 import TrainingAnalytics from './pages/admin/TrainingAnalytics';
 import ProductsManagement from './pages/admin/ProductsManagement';
 
-// Future modules
-import FutureModulesHub from './pages/future/FutureModulesHub';
+// Deep Learning & Generative AI feature pages (Modules 3, 4, 5)
 import VisualRecognition from './pages/future/VisualRecognition';
 import DemandForecasting from './pages/future/DemandForecasting';
 import GenerativeAI from './pages/future/GenerativeAI';
@@ -51,9 +50,10 @@ export default function App() {
       <Route path="/predict" element={<ProtectedRoute role="customer"><AIPrediction /></ProtectedRoute>} />
       <Route path="/predict/result" element={<ProtectedRoute role="customer"><PredictionResult /></ProtectedRoute>} />
       <Route path="/predict/history" element={<ProtectedRoute role="customer"><PredictionHistory /></ProtectedRoute>} />
+      <Route path="/visual-recognition" element={<ProtectedRoute role="customer"><VisualRecognition role="customer" /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute role="customer"><Profile /></ProtectedRoute>} />
 
-      {/* Admin */}
+      {/* Admin — Core Management & Analytics */}
       <Route path="/admin" element={<ProtectedRoute role="admin"><AdminDashboard /></ProtectedRoute>} />
       <Route path="/admin/customers" element={<ProtectedRoute role="admin"><CustomerAnalytics /></ProtectedRoute>} />
       <Route path="/admin/purchase-prediction" element={<ProtectedRoute role="admin"><AdminPurchasePrediction /></ProtectedRoute>} />
@@ -63,10 +63,19 @@ export default function App() {
       <Route path="/admin/hyperparameter-tuning" element={<ProtectedRoute role="admin"><HyperparameterTuning /></ProtectedRoute>} />
       <Route path="/admin/training-analytics" element={<ProtectedRoute role="admin"><TrainingAnalytics /></ProtectedRoute>} />
       <Route path="/admin/products" element={<ProtectedRoute role="admin"><ProductsManagement /></ProtectedRoute>} />
-      <Route path="/admin/future-modules" element={<ProtectedRoute role="admin"><FutureModulesHub /></ProtectedRoute>} />
-      <Route path="/admin/future-modules/visual-recognition" element={<ProtectedRoute role="admin"><VisualRecognition /></ProtectedRoute>} />
-      <Route path="/admin/future-modules/demand-forecasting" element={<ProtectedRoute role="admin"><DemandForecasting /></ProtectedRoute>} />
-      <Route path="/admin/future-modules/generative-ai" element={<ProtectedRoute role="admin"><GenerativeAI /></ProtectedRoute>} />
+
+      {/* Dedicated Module 3, 4, 5 Feature Tabs */}
+      <Route path="/admin/visual-recognition" element={<ProtectedRoute role="admin"><VisualRecognition role="admin" /></ProtectedRoute>} />
+      <Route path="/admin/demand-forecasting" element={<ProtectedRoute role="admin"><DemandForecasting /></ProtectedRoute>} />
+      <Route path="/admin/synthetic-data" element={<ProtectedRoute role="admin"><GenerativeAI initialTab="synthetic" /></ProtectedRoute>} />
+      <Route path="/admin/ai-content" element={<ProtectedRoute role="admin"><GenerativeAI initialTab="content" /></ProtectedRoute>} />
+      <Route path="/admin/generative-ai" element={<ProtectedRoute role="admin"><GenerativeAI /></ProtectedRoute>} />
+
+      {/* Backward-compatibility aliases (redirect legacy future-modules paths) */}
+      <Route path="/admin/future-modules" element={<Navigate to="/admin/visual-recognition" replace />} />
+      <Route path="/admin/future-modules/visual-recognition" element={<Navigate to="/admin/visual-recognition" replace />} />
+      <Route path="/admin/future-modules/demand-forecasting" element={<Navigate to="/admin/demand-forecasting" replace />} />
+      <Route path="/admin/future-modules/generative-ai" element={<Navigate to="/admin/synthetic-data" replace />} />
 
       <Route path="*" element={<NotFound />} />
     </Routes>
