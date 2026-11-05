@@ -144,22 +144,22 @@ def predict_demand(product_name: str, forecast_days: int = 7):
     elif scalers is not None:
         scaler = scalers
 
-    # Read genuine model evaluation metrics from saved metrics
+    # Read genuine model evaluation metrics from saved metrics (no hardcoded defaults)
     metrics_path = os.path.join(Config.RESULTS_DIR, 'forecasting_metrics.json')
-    mae, rmse, mape = 2.0, 2.8, 7.5
+    mae, rmse, mape = None, None, None
     if os.path.exists(metrics_path):
         try:
             with open(metrics_path) as f:
                 saved = json.load(f)
                 prod_m = saved.get('per_product_metrics', {}).get(product_name, {}).get('lstm')
                 if prod_m:
-                    mae = prod_m['mae']
-                    rmse = prod_m['rmse']
-                    mape = prod_m['mape']
+                    mae = prod_m.get('mae')
+                    rmse = prod_m.get('rmse')
+                    mape = prod_m.get('mape')
                 elif 'metrics' in saved:
-                    mae = saved['metrics']['mae']
-                    rmse = saved['metrics']['rmse']
-                    mape = saved['metrics']['mape']
+                    mae = saved['metrics'].get('mae')
+                    rmse = saved['metrics'].get('rmse')
+                    mape = saved['metrics'].get('mape')
         except Exception:
             pass
 
@@ -182,7 +182,7 @@ def predict_demand(product_name: str, forecast_days: int = 7):
             scaled_window.append(pred_scaled)
             total_projected_demand += pred_qty
 
-            spread = max(1, int(round(1.96 * (mae or 2.0))))
+            spread = max(1, int(round(1.96 * mae))) if mae is not None else max(1, int(round(pred_qty * 0.15)))
             lower_bound = max(0, pred_qty - spread)
             upper_bound = pred_qty + spread
             projected_rev = round(pred_qty * unit_price, 2)

@@ -21,11 +21,12 @@ build/
 *.sqlite3
 *.log
 
-# Dynamic Uploads and Exports
+# Dynamic Uploads, Generated Images and Exports
 backend/uploads/
 uploads/
 backend/ml/generative/outputs/
 ml/generative/outputs/
+backend/ml/visual/dataset/train/*/*_aug_*
 
 # OS & Editor
 .DS_Store

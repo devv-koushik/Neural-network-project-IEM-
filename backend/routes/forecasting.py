@@ -71,3 +71,17 @@ def status():
         'supported_horizons': [7, 30],
     })
 
+
+@bp.get('/metrics')
+def metrics():
+    import os
+    import json
+    from config import Config
+    metrics_path = os.path.join(Config.RESULTS_DIR, 'forecasting_metrics.json')
+    if not os.path.exists(metrics_path):
+        return err('Forecasting metrics not found. Train LSTM model first.', 'METRICS_NOT_FOUND', 404)
+    with open(metrics_path, 'r') as f:
+        data = json.load(f)
+    return ok(data)
+
+

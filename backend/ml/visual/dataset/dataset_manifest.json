@@ -1,5 +1,5 @@
 {
-  "dataset_name": "SmartCart Real E-Commerce Product Image Dataset",
+  "dataset_name": "SmartCart Real E-Commerce Product Image Dataset (Expanded & Audited)",
   "license": "Unsplash License (free for commercial and personal use)",
   "categories": [
     "Shoes",
@@ -9,43 +9,43 @@
     "Bags",
     "Other"
   ],
-  "total_images": 84,
+  "total_images": 3027,
   "splits": {
     "Shoes": {
-      "train": 10,
+      "train": 500,
       "val": 2,
       "test": 3,
-      "total": 15
+      "total": 505
     },
     "Shirts": {
-      "train": 10,
+      "train": 500,
       "val": 2,
       "test": 2,
-      "total": 14
+      "total": 504
     },
     "Electronics": {
-      "train": 10,
+      "train": 500,
       "val": 2,
       "test": 3,
-      "total": 15
+      "total": 505
     },
     "Accessories": {
-      "train": 9,
+      "train": 500,
       "val": 2,
       "test": 2,
-      "total": 13
+      "total": 504
     },
     "Bags": {
-      "train": 9,
+      "train": 500,
       "val": 2,
       "test": 2,
-      "total": 13
+      "total": 504
     },
     "Other": {
-      "train": 10,
+      "train": 500,
       "val": 2,
-      "test": 2,
-      "total": 14
+      "test": 3,
+      "total": 505
     }
   }
 }

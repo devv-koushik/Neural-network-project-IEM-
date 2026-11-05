@@ -93,3 +93,16 @@ def status():
         'max_file_size_mb': 10,
         'allowed_formats': list(visual_service.ALLOWED_EXTENSIONS),
     })
+
+
+@bp.get('/metrics')
+def visual_metrics():
+    import json
+    from config import Config
+    metrics_path = os.path.join(Config.RESULTS_DIR, 'visual_metrics.json')
+    if not os.path.exists(metrics_path):
+        return err('Visual recognition metrics not found. Train MobileNetV2 first.', 'METRICS_NOT_FOUND', 404)
+    with open(metrics_path, 'r') as f:
+        data = json.load(f)
+    return ok(data)
+

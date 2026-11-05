@@ -271,11 +271,11 @@ export default function DemandForecasting() {
         />
         <StatCard
           label="Model Test MAPE"
-          value={forecastResult?.metrics?.mape ? `${forecastResult.metrics.mape}%` : '8.4%'}
+          value={forecastResult?.metrics?.mape != null ? `${forecastResult.metrics.mape}%` : '—'}
           icon={LineChartIcon}
           tone="mint"
-          trend={`MAE: ${forecastResult?.metrics?.mae ?? 2.4}`}
-          trendDirection="up"
+          trend={forecastResult?.metrics?.mae != null ? `MAE: ${forecastResult.metrics.mae}` : 'Baseline / Pending'}
+          trendDirection={forecastResult?.metrics?.mape != null ? 'up' : 'neutral'}
         />
       </div>
 

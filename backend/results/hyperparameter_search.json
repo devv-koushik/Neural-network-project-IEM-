@@ -1,0 +1,84 @@
+{
+  "best_config": {
+    "learning_rate": 0.0005,
+    "batch_size": 16,
+    "hidden_units": 96,
+    "dropout": 0.4,
+    "l2": 0.001,
+    "initialization": "he",
+    "use_batchnorm": false,
+    "name": "Search Trial 4",
+    "slug": "trial_4",
+    "status_label": "Trial"
+  },
+  "trials": [
+    {
+      "name": "Search Trial 1",
+      "validation_accuracy": 0.7167,
+      "test_accuracy": 0.7616666666666667,
+      "f1": 0.7803379416282642,
+      "auc": 0.841013760649449,
+      "parameters": {
+        "hidden_units": 128,
+        "dropout": 0.4,
+        "l2": 0.0005,
+        "use_batchnorm": false,
+        "initialization": "he",
+        "learning_rate": 0.001,
+        "batch_size": 64,
+        "status_label": "Trial"
+      }
+    },
+    {
+      "name": "Search Trial 2",
+      "validation_accuracy": 0.7167,
+      "test_accuracy": 0.7658333333333334,
+      "f1": 0.7816627816627817,
+      "auc": 0.8427812346670236,
+      "parameters": {
+        "hidden_units": 64,
+        "dropout": 0.3,
+        "l2": 0.0005,
+        "use_batchnorm": true,
+        "initialization": "glorot",
+        "learning_rate": 0.001,
+        "batch_size": 32,
+        "status_label": "Trial"
+      }
+    },
+    {
+      "name": "Search Trial 3",
+      "validation_accuracy": 0.7183,
+      "test_accuracy": 0.7533333333333333,
+      "f1": 0.7683881064162754,
+      "auc": 0.840127235826754,
+      "parameters": {
+        "hidden_units": 64,
+        "dropout": 0.3,
+        "l2": 0.0,
+        "use_batchnorm": false,
+        "initialization": "glorot",
+        "learning_rate": 0.001,
+        "batch_size": 32,
+        "status_label": "Trial"
+      }
+    },
+    {
+      "name": "Search Trial 4",
+      "validation_accuracy": 0.7192,
+      "test_accuracy": 0.7583333333333333,
+      "f1": 0.7691082802547771,
+      "auc": 0.8430042597796512,
+      "parameters": {
+        "hidden_units": 96,
+        "dropout": 0.4,
+        "l2": 0.001,
+        "use_batchnorm": false,
+        "initialization": "he",
+        "learning_rate": 0.0005,
+        "batch_size": 16,
+        "status_label": "Trial"
+      }
+    }
+  ]
+}

@@ -1,0 +1,118 @@
+{
+  "model_name": "MobileNetV2 Fine-Tuned Transfer Learning",
+  "dataset": "SmartCart Real E-Commerce Product Image Dataset (Unsplash CC0-equivalent)",
+  "categories": [
+    "Shoes",
+    "Shirts",
+    "Electronics",
+    "Accessories",
+    "Bags",
+    "Other"
+  ],
+  "test_accuracy": 0.6875,
+  "val_accuracy": 0.6153846383094788,
+  "val_loss": 1.694610595703125,
+  "training_time_seconds": 728.85,
+  "confusion_matrix": [
+    [
+      3,
+      0,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      2,
+      0,
+      0,
+      0,
+      0
+    ],
+    [
+      0,
+      0,
+      2,
+      0,
+      0,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      1,
+      1
+    ],
+    [
+      0,
+      0,
+      0,
+      0,
+      3,
+      0
+    ],
+    [
+      0,
+      0,
+      1,
+      1,
+      0,
+      1
+    ]
+  ],
+  "classification_report": {
+    "Shoes": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 3.0
+    },
+    "Shirts": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1-score": 1.0,
+      "support": 2.0
+    },
+    "Electronics": {
+      "precision": 0.6666666666666666,
+      "recall": 0.6666666666666666,
+      "f1-score": 0.6666666666666666,
+      "support": 3.0
+    },
+    "Accessories": {
+      "precision": 0.0,
+      "recall": 0.0,
+      "f1-score": 0.0,
+      "support": 2.0
+    },
+    "Bags": {
+      "precision": 0.75,
+      "recall": 1.0,
+      "f1-score": 0.8571428571428571,
+      "support": 3.0
+    },
+    "Other": {
+      "precision": 0.3333333333333333,
+      "recall": 0.3333333333333333,
+      "f1-score": 0.3333333333333333,
+      "support": 3.0
+    },
+    "accuracy": 0.6875,
+    "macro avg": {
+      "precision": 0.625,
+      "recall": 0.6666666666666666,
+      "f1-score": 0.6428571428571429,
+      "support": 16.0
+    },
+    "weighted avg": {
+      "precision": 0.640625,
+      "recall": 0.6875,
+      "f1-score": 0.6607142857142857,
+      "support": 16.0
+    }
+  },
+  "epochs_run": 12
+}

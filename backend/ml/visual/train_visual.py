@@ -132,7 +132,7 @@ def train_visual_classifier(epochs=15, fine_tune_epochs=5):
         X_train, y_train,
         validation_data=(X_val, y_val),
         epochs=epochs,
-        batch_size=8,
+        batch_size=32,
         callbacks=[tb_cb, early_stop],
         verbose=1,
     )
@@ -151,7 +151,7 @@ def train_visual_classifier(epochs=15, fine_tune_epochs=5):
         X_train, y_train,
         validation_data=(X_val, y_val),
         epochs=fine_tune_epochs,
-        batch_size=8,
+        batch_size=32,
         callbacks=[early_stop],
         verbose=1,
     )

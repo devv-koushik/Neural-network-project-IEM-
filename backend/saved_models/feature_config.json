@@ -1,0 +1,58 @@
+{
+  "numeric_features": [
+    "Age",
+    "Browsing_Time",
+    "Pages_Viewed",
+    "Previous_Purchases",
+    "Average_Order_Value",
+    "Number_of_Sessions",
+    "Cart_Additions",
+    "Cart_Abandonments",
+    "Days_Since_Last_Purchase",
+    "Customer_Lifetime_Value",
+    "Discount_Usage",
+    "Support_Interactions"
+  ],
+  "categorical_features": [
+    "Gender",
+    "Device_Type"
+  ],
+  "all_features": [
+    "Age",
+    "Browsing_Time",
+    "Pages_Viewed",
+    "Previous_Purchases",
+    "Average_Order_Value",
+    "Number_of_Sessions",
+    "Cart_Additions",
+    "Cart_Abandonments",
+    "Days_Since_Last_Purchase",
+    "Customer_Lifetime_Value",
+    "Discount_Usage",
+    "Support_Interactions",
+    "Gender",
+    "Device_Type"
+  ],
+  "category_choices": {
+    "Gender": [
+      "Female",
+      "Male",
+      "Other"
+    ],
+    "Device_Type": [
+      "Mobile",
+      "Desktop",
+      "Tablet"
+    ]
+  },
+  "encoding": "OneHotEncoder",
+  "encoded_categorical_columns": [
+    "Gender_Female",
+    "Gender_Male",
+    "Gender_Other",
+    "Device_Type_Mobile",
+    "Device_Type_Desktop",
+    "Device_Type_Tablet"
+  ],
+  "total_input_dim": 18
+}

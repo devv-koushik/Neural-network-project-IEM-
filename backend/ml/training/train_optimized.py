@@ -233,6 +233,27 @@ if __name__ == '__main__':
 
     save_to_database(all_results, target='purchase')
 
+    # Run randomized hyperparameter search
+    print('\n=== Running Randomized Hyperparameter Search ===')
+    search_results, best_search_config = run_randomized_search(target=TARGET, n_iter=4)
+    search_summary = {
+        'best_config': best_search_config,
+        'trials': [
+            {
+                'name': t['name'],
+                'validation_accuracy': t['validation_accuracy'],
+                'test_accuracy': t['test_accuracy'],
+                'f1': t['f1'],
+                'auc': t['auc'],
+                'parameters': t['parameters']
+            }
+            for t in search_results
+        ]
+    }
+    with open(os.path.join(Config.RESULTS_DIR, 'hyperparameter_search.json'), 'w') as f:
+        json.dump(search_summary, f, indent=2)
+    print(f'Saved hyperparameter search results -> {os.path.join(Config.RESULTS_DIR, "hyperparameter_search.json")}')
+
     # Also train optimized churn model
     print('\n=== Optimizing Churn Model ===')
     X_train_c, y_train_c, X_val_c, y_val_c, X_test_c, y_test_c = load_split(target='churn')
