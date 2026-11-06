@@ -44,25 +44,27 @@ export default function Sidebar({ role = 'customer', mobileOpen = false, onClose
 
   // --- Desktop Compact Circular Icon-Rail Sidebar ---
   const desktopSidebar = (
-    <aside className="hidden lg:flex lg:w-[76px] lg:flex-col lg:shrink-0 lg:sticky lg:top-0 lg:h-screen lg:border-r lg:border-ink-100 dark:lg:border-ink-800 lg:bg-white dark:lg:bg-ink-950 z-30 select-none py-5">
-      <div className="flex h-full w-full flex-col items-center">
+    <aside className="hidden lg:flex lg:w-[76px] lg:flex-col lg:shrink-0 lg:sticky lg:top-0 lg:h-screen lg:border-r lg:border-ink-100 dark:lg:border-ink-800 lg:bg-white dark:lg:bg-ink-950 z-[70] select-none py-5 overflow-visible">
+      <div className="flex h-full w-full flex-col items-center overflow-visible">
         
         {/* Top: Logo & AI Status Bubble */}
-        <div className="flex flex-col items-center gap-2.5 shrink-0 mb-4">
+        <div className="flex flex-col items-center gap-2.5 shrink-0 mb-4 overflow-visible">
           {/* Logo Icon */}
-          <Link
-            to="/"
-            className="group relative flex h-11 w-11 items-center justify-center rounded-2xl overflow-hidden bg-signal-500/10 dark:bg-signal-500/15 border border-signal-500/20 hover:scale-105 transition-all duration-200"
-            aria-label="SmartCart AI Home"
-          >
-            <img
-              src="/logo.jpg"
-              alt="SmartCart AI"
-              className="h-8 w-8 object-cover rounded-xl"
-            />
+          <div className="relative flex justify-center group overflow-visible">
+            <Link
+              to="/"
+              className="flex h-11 w-11 items-center justify-center rounded-2xl overflow-hidden bg-signal-500/10 dark:bg-signal-500/15 border border-signal-500/20 hover:scale-105 transition-all duration-200"
+              aria-label="SmartCart AI Home"
+            >
+              <img
+                src="/logo.jpg"
+                alt="SmartCart AI"
+                className="h-8 w-8 object-cover rounded-xl"
+              />
+            </Link>
             {/* Expandable Label */}
-            <div className="pointer-events-none absolute left-[58px] top-1/2 -translate-y-1/2 z-50 flex items-center opacity-0 -translate-x-2 scale-95 transition-all duration-200 ease-out group-hover:pointer-events-auto group-hover:opacity-100 group-hover:translate-x-0 group-hover:scale-100">
-              <div className="h-2 w-2 -mr-1 rotate-45 bg-ink-900 dark:bg-white shadow-sm" />
+            <div className="pointer-events-none absolute left-[56px] top-1/2 -translate-y-1/2 z-[80] flex items-center pl-2 opacity-0 -translate-x-2 scale-95 transition-all duration-200 ease-out group-hover:pointer-events-auto group-hover:opacity-100 group-hover:translate-x-0 group-hover:scale-100 drop-shadow-xl">
+              <div className="h-2 w-2 -mr-1 rotate-45 bg-ink-900 dark:bg-white shrink-0 shadow-sm" />
               <div className="flex flex-col rounded-xl bg-ink-900 dark:bg-white text-white dark:text-ink-950 px-3.5 py-2 text-xs shadow-2xl border border-ink-800 dark:border-ink-200 whitespace-nowrap">
                 <span className="font-bold font-display text-sm">SmartCart AI</span>
                 <span className="text-[10px] opacity-70">
@@ -70,10 +72,10 @@ export default function Sidebar({ role = 'customer', mobileOpen = false, onClose
                 </span>
               </div>
             </div>
-          </Link>
+          </div>
 
           {/* Quick AI Status Bubble (matches circular +2 pill in screenshot) */}
-          <div className="group relative flex items-center justify-center">
+          <div className="relative flex justify-center group overflow-visible">
             <div
               className="flex flex-col items-center justify-center h-10 w-10 rounded-full bg-signal-500/10 dark:bg-signal-500/20 border border-signal-500/25 text-signal-500 hover:scale-105 transition-all duration-200 cursor-default"
               aria-label="5 AI Models Online"
@@ -84,8 +86,8 @@ export default function Sidebar({ role = 'customer', mobileOpen = false, onClose
               </span>
             </div>
             {/* Expandable status message */}
-            <div className="pointer-events-none absolute left-[58px] top-1/2 -translate-y-1/2 z-50 flex items-center opacity-0 -translate-x-2 scale-95 transition-all duration-200 ease-out group-hover:pointer-events-auto group-hover:opacity-100 group-hover:translate-x-0 group-hover:scale-100">
-              <div className="h-2 w-2 -mr-1 rotate-45 bg-ink-900 dark:bg-white shadow-sm" />
+            <div className="pointer-events-none absolute left-[56px] top-1/2 -translate-y-1/2 z-[80] flex items-center pl-2 opacity-0 -translate-x-2 scale-95 transition-all duration-200 ease-out group-hover:pointer-events-auto group-hover:opacity-100 group-hover:translate-x-0 group-hover:scale-100 drop-shadow-xl">
+              <div className="h-2 w-2 -mr-1 rotate-45 bg-ink-900 dark:bg-white shrink-0 shadow-sm" />
               <div className="flex items-center gap-2 rounded-xl bg-ink-900 dark:bg-white text-white dark:text-ink-950 px-3.5 py-2 text-xs font-semibold shadow-2xl border border-ink-800 dark:border-ink-200 whitespace-nowrap">
                 <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
                 <span>5 AI Modules Trained & Ready</span>
@@ -95,10 +97,10 @@ export default function Sidebar({ role = 'customer', mobileOpen = false, onClose
         </div>
 
         {/* Middle: Navigation Column of Circular Buttons */}
-        <nav className="flex-1 w-full flex flex-col items-center overflow-y-auto overflow-x-hidden no-scrollbar py-1">
-          <ul className="flex flex-col items-center space-y-2.5">
+        <nav className="flex-1 w-full flex flex-col items-center overflow-visible py-1">
+          <ul className="flex flex-col items-center space-y-2.5 overflow-visible">
             {links.map((l) => (
-              <li key={l.to} className="relative flex justify-center group">
+              <li key={l.to} className="relative flex justify-center group overflow-visible">
                 <NavLink
                   to={l.to}
                   end={l.end}
@@ -117,8 +119,8 @@ export default function Sidebar({ role = 'customer', mobileOpen = false, onClose
                 </NavLink>
 
                 {/* Hover Expandable Option Name */}
-                <div className="pointer-events-none absolute left-[58px] top-1/2 -translate-y-1/2 z-50 flex items-center opacity-0 -translate-x-2 scale-95 transition-all duration-200 ease-out group-hover:pointer-events-auto group-hover:opacity-100 group-hover:translate-x-0 group-hover:scale-100">
-                  <div className="h-2 w-2 -mr-1 rotate-45 bg-ink-900 dark:bg-white shadow-sm" />
+                <div className="pointer-events-none absolute left-[56px] top-1/2 -translate-y-1/2 z-[80] flex items-center pl-2 opacity-0 -translate-x-2 scale-95 transition-all duration-200 ease-out group-hover:pointer-events-auto group-hover:opacity-100 group-hover:translate-x-0 group-hover:scale-100 drop-shadow-xl">
+                  <div className="h-2 w-2 -mr-1 rotate-45 bg-ink-900 dark:bg-white shrink-0 shadow-sm" />
                   <div className="flex items-center gap-2 rounded-xl bg-ink-900 dark:bg-white text-white dark:text-ink-950 px-3.5 py-2 text-xs font-semibold shadow-2xl border border-ink-800 dark:border-ink-200 whitespace-nowrap">
                     <span>{l.label}</span>
                     <span className="text-[10px] font-normal opacity-60">
@@ -132,10 +134,10 @@ export default function Sidebar({ role = 'customer', mobileOpen = false, onClose
         </nav>
 
         {/* Bottom: Settings, User Avatar & Logout */}
-        <div className="mt-auto flex flex-col items-center space-y-2.5 pt-3 border-t border-ink-100 dark:border-ink-800/80 w-full shrink-0">
+        <div className="mt-auto flex flex-col items-center space-y-2.5 pt-3 border-t border-ink-100 dark:border-ink-800/80 w-full shrink-0 overflow-visible">
           {/* Customer Settings */}
           {role === 'customer' && (
-            <div className="relative flex justify-center group">
+            <div className="relative flex justify-center group overflow-visible">
               <NavLink
                 to="/profile"
                 className={({ isActive }) =>
@@ -151,8 +153,8 @@ export default function Sidebar({ role = 'customer', mobileOpen = false, onClose
               </NavLink>
 
               {/* Hover Expand */}
-              <div className="pointer-events-none absolute left-[58px] top-1/2 -translate-y-1/2 z-50 flex items-center opacity-0 -translate-x-2 scale-95 transition-all duration-200 ease-out group-hover:pointer-events-auto group-hover:opacity-100 group-hover:translate-x-0 group-hover:scale-100">
-                <div className="h-2 w-2 -mr-1 rotate-45 bg-ink-900 dark:bg-white shadow-sm" />
+              <div className="pointer-events-none absolute left-[56px] top-1/2 -translate-y-1/2 z-[80] flex items-center pl-2 opacity-0 -translate-x-2 scale-95 transition-all duration-200 ease-out group-hover:pointer-events-auto group-hover:opacity-100 group-hover:translate-x-0 group-hover:scale-100 drop-shadow-xl">
+                <div className="h-2 w-2 -mr-1 rotate-45 bg-ink-900 dark:bg-white shrink-0 shadow-sm" />
                 <div className="rounded-xl bg-ink-900 dark:bg-white text-white dark:text-ink-950 px-3.5 py-2 text-xs font-semibold shadow-2xl border border-ink-800 dark:border-ink-200 whitespace-nowrap">
                   Account Settings
                 </div>
@@ -161,7 +163,7 @@ export default function Sidebar({ role = 'customer', mobileOpen = false, onClose
           )}
 
           {/* User Avatar */}
-          <div className="relative flex justify-center group">
+          <div className="relative flex justify-center group overflow-visible">
             <div
               className="flex h-10 w-10 items-center justify-center rounded-full bg-signal-500 text-white text-xs font-bold shadow-sm hover:scale-105 transition-all cursor-default"
               aria-label={`Logged in as ${user?.name || 'User'}`}
@@ -170,8 +172,8 @@ export default function Sidebar({ role = 'customer', mobileOpen = false, onClose
             </div>
 
             {/* Hover Expand */}
-            <div className="pointer-events-none absolute left-[58px] top-1/2 -translate-y-1/2 z-50 flex items-center opacity-0 -translate-x-2 scale-95 transition-all duration-200 ease-out group-hover:pointer-events-auto group-hover:opacity-100 group-hover:translate-x-0 group-hover:scale-100">
-              <div className="h-2 w-2 -mr-1 rotate-45 bg-ink-900 dark:bg-white shadow-sm" />
+            <div className="pointer-events-none absolute left-[56px] top-1/2 -translate-y-1/2 z-[80] flex items-center pl-2 opacity-0 -translate-x-2 scale-95 transition-all duration-200 ease-out group-hover:pointer-events-auto group-hover:opacity-100 group-hover:translate-x-0 group-hover:scale-100 drop-shadow-xl">
+              <div className="h-2 w-2 -mr-1 rotate-45 bg-ink-900 dark:bg-white shrink-0 shadow-sm" />
               <div className="flex flex-col rounded-xl bg-ink-900 dark:bg-white text-white dark:text-ink-950 px-3.5 py-2 text-xs shadow-2xl border border-ink-800 dark:border-ink-200 whitespace-nowrap">
                 <span className="font-bold text-sm">{user?.name || 'User'}</span>
                 <span className="text-[10px] opacity-70">{user?.email || ''}</span>
@@ -180,7 +182,7 @@ export default function Sidebar({ role = 'customer', mobileOpen = false, onClose
           </div>
 
           {/* Logout Button */}
-          <div className="relative flex justify-center group">
+          <div className="relative flex justify-center group overflow-visible">
             <button
               onClick={handleLogout}
               className="flex h-10 w-10 items-center justify-center rounded-full bg-ink-100 dark:bg-ink-850/80 text-ink-500 dark:text-ink-400 hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400 hover:scale-105 transition-all duration-200"
@@ -190,9 +192,9 @@ export default function Sidebar({ role = 'customer', mobileOpen = false, onClose
             </button>
 
             {/* Hover Expand */}
-            <div className="pointer-events-none absolute left-[58px] top-1/2 -translate-y-1/2 z-50 flex items-center opacity-0 -translate-x-2 scale-95 transition-all duration-200 ease-out group-hover:pointer-events-auto group-hover:opacity-100 group-hover:translate-x-0 group-hover:scale-100">
-              <div className="h-2 w-2 -mr-1 rotate-45 bg-ink-900 dark:bg-white shadow-sm" />
-              <div className="rounded-xl bg-ink-900 dark:bg-white text-white dark:text-ink-950 px-3.5 py-2 text-xs font-semibold shadow-2xl border border-ink-800 dark:border-ink-200 whitespace-nowrap text-rose-500 dark:text-rose-600">
+            <div className="pointer-events-none absolute left-[56px] top-1/2 -translate-y-1/2 z-[80] flex items-center pl-2 opacity-0 -translate-x-2 scale-95 transition-all duration-200 ease-out group-hover:pointer-events-auto group-hover:opacity-100 group-hover:translate-x-0 group-hover:scale-100 drop-shadow-xl">
+              <div className="h-2 w-2 -mr-1 rotate-45 bg-ink-900 dark:bg-white shrink-0 shadow-sm" />
+              <div className="rounded-xl bg-ink-900 dark:bg-white text-rose-500 dark:text-rose-600 px-3.5 py-2 text-xs font-semibold shadow-2xl border border-ink-800 dark:border-ink-200 whitespace-nowrap">
                 Log out
               </div>
             </div>
