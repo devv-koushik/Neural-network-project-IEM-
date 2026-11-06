@@ -3,7 +3,7 @@ import {
   ShoppingBag, ScanEye, ShoppingCart, Users, TrendingUp,
   AlertOctagon, SlidersHorizontal, Package,
   BarChart2, Database, Wand2,
-  X, LogOut, Sparkles,
+  X, LogOut,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
@@ -46,8 +46,8 @@ export default function Sidebar({ role = 'customer', mobileOpen = false, onClose
     <aside className="hidden lg:flex lg:w-[76px] lg:flex-col lg:shrink-0 lg:sticky lg:top-0 lg:h-screen lg:border-r lg:border-ink-100 dark:lg:border-ink-800 lg:bg-white dark:lg:bg-ink-950 z-[70] select-none py-5 overflow-visible">
       <div className="flex h-full w-full flex-col items-center overflow-visible">
         
-        {/* Top: Logo & AI Status Bubble */}
-        <div className="flex flex-col items-center gap-2.5 shrink-0 mb-4 overflow-visible">
+        {/* Top: Logo */}
+        <div className="flex flex-col items-center shrink-0 mb-4 overflow-visible">
           {/* Logo Icon */}
           <div className="relative flex justify-center group overflow-visible">
             <Link
@@ -69,27 +69,6 @@ export default function Sidebar({ role = 'customer', mobileOpen = false, onClose
                 <span className="text-[10px] opacity-70">
                   {role === 'admin' ? 'Admin Console' : 'Customer Portal'}
                 </span>
-              </div>
-            </div>
-          </div>
-
-          {/* Quick AI Status Bubble (matches circular +2 pill in screenshot) */}
-          <div className="relative flex justify-center group overflow-visible">
-            <div
-              className="flex flex-col items-center justify-center h-10 w-10 rounded-full bg-signal-500/10 dark:bg-signal-500/20 border border-signal-500/25 text-signal-500 hover:scale-105 transition-all duration-200 cursor-default"
-              aria-label="5 AI Models Online"
-            >
-              <Sparkles size={14} className="text-signal-500" />
-              <span className="text-[10px] font-bold leading-none mt-0.5 text-signal-600 dark:text-signal-400">
-                +5
-              </span>
-            </div>
-            {/* Expandable status message */}
-            <div className="pointer-events-none absolute left-[56px] top-1/2 -translate-y-1/2 z-[80] flex items-center pl-2 opacity-0 -translate-x-2 scale-95 transition-all duration-200 ease-out group-hover:pointer-events-auto group-hover:opacity-100 group-hover:translate-x-0 group-hover:scale-100 drop-shadow-xl">
-              <div className="h-2 w-2 -mr-1 rotate-45 bg-ink-900 dark:bg-white shrink-0 shadow-sm" />
-              <div className="flex items-center gap-2 rounded-xl bg-ink-900 dark:bg-white text-white dark:text-ink-950 px-3.5 py-2 text-xs font-semibold shadow-2xl border border-ink-800 dark:border-ink-200 whitespace-nowrap">
-                <span className="flex h-2 w-2 rounded-full bg-emerald-500 animate-pulse" />
-                <span>5 AI Modules Trained & Ready</span>
               </div>
             </div>
           </div>
