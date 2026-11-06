@@ -3,11 +3,18 @@ import { Camera, Save, Bell, Shield, User, Lock } from 'lucide-react';
 import { DashboardLayout } from '../../components/layout/Layout';
 import Card from '../../components/common/Card';
 import Input from '../../components/common/Input';
+import Select from '../../components/common/Select';
 import Button from '../../components/common/Button';
 import Badge from '../../components/common/Badge';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
 import { getCurrentUser, updateProfile, changePassword } from '../../services/api';
+
+const GENDER_OPTIONS = [
+  { value: 'Female', label: 'Female' },
+  { value: 'Male', label: 'Male' },
+  { value: 'Other', label: 'Other' },
+];
 
 function formatMemberSince(isoDate) {
   if (!isoDate) return '—';
@@ -24,6 +31,8 @@ export default function Profile() {
 
   const [name, setName] = useState(user?.name || '');
   const [email, setEmail] = useState(user?.email || '');
+  const [age, setAge] = useState(user?.age ?? '');
+  const [gender, setGender] = useState(user?.gender || 'Female');
   const [notifications, setNotifications] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -44,6 +53,8 @@ export default function Profile() {
       .then((u) => {
         setName(u.name || '');
         setEmail(u.email || '');
+        setAge(u.age ?? '');
+        setGender(u.gender || 'Female');
         setMemberSince(u.created_at || null);
         setTotalPredictions(u.total_predictions ?? null);
         setLatestPrediction(u.latest_prediction || null);
@@ -51,6 +62,8 @@ export default function Profile() {
       .catch(() => {
         // Backend unavailable — keep values from auth context
         setMemberSince(user?.created_at || null);
+        setAge(user?.age ?? '');
+        setGender(user?.gender || 'Female');
       });
   }, []);
 
@@ -58,8 +71,21 @@ export default function Profile() {
     e.preventDefault();
     setSaving(true);
     try {
-      const updatedUser = await updateProfile({ name, email });
-      if (setUser) setUser((prev) => ({ ...prev, name: updatedUser.name, email: updatedUser.email }));
+      const updatedUser = await updateProfile({
+        name: name.trim(),
+        email: email.trim(),
+        age: age !== '' ? parseInt(age, 10) : null,
+        gender,
+      });
+      if (setUser) {
+        setUser((prev) => ({
+          ...prev,
+          name: updatedUser.name,
+          email: updatedUser.email,
+          age: updatedUser.age ?? age,
+          gender: updatedUser.gender ?? gender,
+        }));
+      }
       showToast('Profile updated successfully.', 'success');
     } catch (error) {
       const msg = error?.response?.data?.error?.message || 'Failed to update profile.';
@@ -113,6 +139,18 @@ export default function Profile() {
           <Badge tone="signal" className="mt-3">Customer account</Badge>
           <div className="mt-6 w-full space-y-3 text-left">
             <div className="flex items-center justify-between text-sm">
+              <span className="text-ink-400">Gender</span>
+              <span className="font-medium text-ink-700 dark:text-ink-200">
+                {gender || '—'}
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-ink-400">Age</span>
+              <span className="font-medium text-ink-700 dark:text-ink-200">
+                {age ? `${age} years` : '—'}
+              </span>
+            </div>
+            <div className="flex items-center justify-between text-sm">
               <span className="text-ink-400">Member since</span>
               <span className="font-medium text-ink-700 dark:text-ink-200">
                 {memberSince ? formatMemberSince(memberSince) : '—'}
@@ -151,6 +189,22 @@ export default function Profile() {
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <Input id="name" label="Full name" value={name} onChange={(e) => setName(e.target.value)} />
                 <Input id="email" label="Email" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                <Input
+                  id="age"
+                  label="Age"
+                  type="number"
+                  min="13"
+                  max="120"
+                  value={age}
+                  onChange={(e) => setAge(e.target.value)}
+                />
+                <Select
+                  id="gender"
+                  label="Gender"
+                  options={GENDER_OPTIONS}
+                  value={gender}
+                  onChange={(e) => setGender(e.target.value)}
+                />
               </div>
               <Button type="submit" variant="primary" icon={Save} loading={saving}>Save changes</Button>
             </form>

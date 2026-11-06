@@ -18,7 +18,13 @@ def _token_for(user):
 def register():
     body = request.get_json(silent=True) or {}
     try:
-        user = register_user(body.get('name'), body.get('email'), body.get('password'))
+        user = register_user(
+            body.get('name'),
+            body.get('email'),
+            body.get('password'),
+            age=body.get('age'),
+            gender=body.get('gender'),
+        )
     except AuthError as e:
         return err(e.message, e.code, e.status)
 
@@ -75,7 +81,7 @@ def me():
 @bp.put('/profile')
 @jwt_required()
 def update_profile():
-    """Update the authenticated user's name and/or email."""
+    """Update the authenticated user's name, email, age, and/or gender."""
     user_id = get_jwt_identity()
     user = db.session.get(User, int(user_id))
     if not user:
@@ -84,14 +90,31 @@ def update_profile():
     body = request.get_json(silent=True) or {}
     new_name = (body.get('name') or '').strip()
     new_email = (body.get('email') or '').strip().lower()
+    new_age = body.get('age')
+    new_gender = (body.get('gender') or '').strip()
 
     if new_name:
         user.name = new_name
+        if user.customer:
+            user.customer.name = new_name
     if new_email and new_email != user.email:
         existing = User.query.filter_by(email=new_email).first()
         if existing and existing.id != user.id:
             return err('Email is already taken.', 'EMAIL_TAKEN', 409)
         user.email = new_email
+        if user.customer:
+            user.customer.email = new_email
+
+    if user.customer:
+        if new_age is not None and str(new_age).strip() != '':
+            try:
+                user.customer.age = int(new_age)
+            except (ValueError, TypeError):
+                pass
+        if new_gender:
+            clean_g = new_gender.capitalize()
+            if clean_g in ('Female', 'Male', 'Other'):
+                user.customer.gender = clean_g
 
     db.session.commit()
     user_dict = user.to_dict()

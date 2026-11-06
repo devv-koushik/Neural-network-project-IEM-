@@ -50,8 +50,8 @@ function warnFallback(fnName, error) {
 }
 
 const DEMO_ACCOUNTS = {
-  'customer@demo.com': { password: 'customer123', role: 'customer', name: 'Pritam Customer', id: 'demo_customer' },
-  'admin@demo.com': { password: 'admin123', role: 'admin', name: 'Koushik Admin', id: 'demo_admin' },
+  'customer@demo.com': { password: 'customer123', role: 'customer', name: 'Pritam Sharma', id: 'demo_customer', age: 28, gender: 'Male' },
+  'admin@demo.com': { password: 'admin123', role: 'admin', name: 'Koushik Admin', id: 'demo_admin', age: 30, gender: 'Male' },
 };
 
 // A category -> icon fallback for products coming from the backend, which
@@ -141,20 +141,27 @@ export async function loginUser({ email, password }) {
       throw err;
     }
     setAuthToken(null); // no real JWT available offline; requests needing auth will also fall back
-    return { id: account.id, email, name: account.name, role: account.role };
+    return { id: account.id, email, name: account.name, role: account.role, age: account.age, gender: account.gender };
   }
 }
 
-export async function registerUser({ name, email, password }) {
+export async function registerUser({ name, email, password, age, gender }) {
   try {
-    const { data } = await apiClient.post('/auth/register', { name, email, password });
+    const { data } = await apiClient.post('/auth/register', { name, email, password, age, gender });
     setAuthToken(data.data.token);
     return data.data.user;
   } catch (error) {
     warnFallback('registerUser', error);
     await delay(400);
     setAuthToken(null);
-    return { id: `u_${Date.now()}`, name, email, role: 'customer' };
+    return {
+      id: `u_${Date.now()}`,
+      name,
+      email,
+      role: 'customer',
+      age: Number(age) || 25,
+      gender: gender || 'Female',
+    };
   }
 }
 
@@ -173,8 +180,8 @@ export async function getCurrentUser() {
   return data.data.user;
 }
 
-export async function updateProfile({ name, email }) {
-  const { data } = await apiClient.put('/auth/profile', { name, email });
+export async function updateProfile({ name, email, age, gender }) {
+  const { data } = await apiClient.put('/auth/profile', { name, email, age, gender });
   return data.data.user;
 }
 

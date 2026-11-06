@@ -58,10 +58,14 @@ export function AuthProvider({ children }) {
     }
   }
 
-  async function register(name, email, password) {
+  async function register(nameOrData, email, password, age, gender) {
     setLoading(true);
     try {
-      const account = await registerUser({ name, email, password });
+      const payload =
+        typeof nameOrData === 'object'
+          ? nameOrData
+          : { name: nameOrData, email, password, age, gender };
+      const account = await registerUser(payload);
       setUser(account);
       return account;
     } finally {

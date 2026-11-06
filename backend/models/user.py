@@ -22,12 +22,17 @@ class User(db.Model):
         return check_password_hash(self.password_hash, raw_password)
 
     def to_dict(self):
-        return {
+        data = {
             'id': self.id,
             'name': self.name,
             'email': self.email,
             'role': self.role,
         }
+        if self.customer:
+            data['age'] = self.customer.age
+            data['gender'] = self.customer.gender
+            data['device_type'] = self.customer.device_type
+        return data
 
     def __repr__(self):
         return f'<User {self.email} ({self.role})>'
