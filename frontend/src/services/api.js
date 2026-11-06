@@ -50,7 +50,7 @@ function warnFallback(fnName, error) {
 }
 
 const DEMO_ACCOUNTS = {
-  'customer@demo.com': { password: 'customer123', role: 'customer', name: 'Pritam Sharma', id: 'demo_customer', age: 28, gender: 'Male' },
+  'customer@demo.com': { password: 'customer123', role: 'customer', name: 'Pritam Sharma', id: 'demo_customer', age: 21, gender: 'Male' },
   'admin@demo.com': { password: 'admin123', role: 'admin', name: 'Koushik Admin', id: 'demo_admin', age: 30, gender: 'Male' },
 };
 

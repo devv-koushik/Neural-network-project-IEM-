@@ -27,9 +27,10 @@ function seededRandom(seed) {
 
 function buildCustomer(i) {
   const rnd = seededRandom(i * 137 + 7);
-  const first = FIRST[i % FIRST.length];
-  const last = LAST[(i * 7 + 3) % LAST.length];
-  const age = 18 + Math.floor(rnd() * 50);
+  const isDefaultPritam = i === 0;
+  const first = isDefaultPritam ? 'Pritam' : FIRST[i % FIRST.length];
+  const last = isDefaultPritam ? 'Sharma' : LAST[(i * 7 + 3) % LAST.length];
+  const age = isDefaultPritam ? 21 : 18 + Math.floor(rnd() * 50);
   const purchases = Math.floor(rnd() * 40);
   const sessions = Math.floor(rnd() * 60) + 1;
   const browsingMinutes = Math.round((rnd() * 45 + 2) * 10) / 10;
@@ -44,9 +45,9 @@ function buildCustomer(i) {
   return {
     id: `c${i + 1}`,
     name: `${first} ${last}`,
-    email: `${first.toLowerCase()}.${last.toLowerCase()}@mail.com`,
+    email: isDefaultPritam ? 'customer@demo.com' : `${first.toLowerCase()}.${last.toLowerCase()}@mail.com`,
     age,
-    gender: rnd() > 0.5 ? 'Female' : 'Male',
+    gender: isDefaultPritam ? 'Male' : (rnd() > 0.5 ? 'Female' : 'Male'),
     device: ['Mobile', 'Desktop', 'Tablet'][Math.floor(rnd() * 3)],
     purchases,
     sessions,

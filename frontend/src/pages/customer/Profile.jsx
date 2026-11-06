@@ -215,16 +215,24 @@ export default function Profile() {
             <div className="flex items-center gap-2 mb-5"><Bell size={16} className="text-amber-500" /><h3 className="font-display text-sm font-semibold text-ink-800 dark:text-white">Preferences</h3></div>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-ink-700 dark:text-ink-100">Prediction notifications</p>
-                <p className="text-xs text-ink-400">Get notified when a new prediction is ready</p>
+                <p className="text-sm font-medium text-ink-700 dark:text-ink-100">Push notifications</p>
+                <p className="text-xs text-ink-400">Receive alerts for order status, cart updates, and deals</p>
               </div>
               <button
+                type="button"
                 onClick={() => setNotifications((n) => !n)}
                 aria-pressed={notifications}
-                aria-label="Toggle prediction notifications"
-                className={`relative h-6 w-11 rounded-full transition-colors ${notifications ? 'bg-signal-500' : 'bg-ink-200 dark:bg-ink-700'}`}
+                aria-label="Toggle push notifications"
+                className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-signal-500 focus:ring-offset-2 ${
+                  notifications ? 'bg-signal-500' : 'bg-ink-200 dark:bg-ink-700'
+                }`}
               >
-                <span className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform ${notifications ? 'translate-x-5' : 'translate-x-0.5'}`} />
+                <span
+                  aria-hidden="true"
+                  className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow-md ring-0 transition-transform duration-200 ease-in-out ${
+                    notifications ? 'translate-x-5' : 'translate-x-0'
+                  }`}
+                />
               </button>
             </div>
           </Card>
