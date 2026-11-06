@@ -10,7 +10,6 @@ import { useCart } from '../../hooks/useCart';
 const LINKS = [
   { to: '/', label: 'Home' },
   { to: '/products', label: 'Products' },
-  { to: '/#modules', label: 'AI Modules' },
 ];
 
 export default function Navbar() {
