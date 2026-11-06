@@ -44,11 +44,11 @@ export default function Sidebar({ role = 'customer', mobileOpen = false, onClose
 
   // --- Desktop Compact Circular Icon-Rail Sidebar ---
   const desktopSidebar = (
-    <aside className="hidden lg:flex lg:w-[76px] lg:flex-col lg:shrink-0 lg:border-r lg:border-ink-100 dark:lg:border-ink-800 lg:bg-white dark:lg:bg-ink-950 z-30 select-none py-5">
-      <div className="flex h-full flex-col items-center justify-between">
+    <aside className="hidden lg:flex lg:w-[76px] lg:flex-col lg:shrink-0 lg:sticky lg:top-0 lg:h-screen lg:border-r lg:border-ink-100 dark:lg:border-ink-800 lg:bg-white dark:lg:bg-ink-950 z-30 select-none py-5">
+      <div className="flex h-full w-full flex-col items-center">
         
         {/* Top: Logo & AI Status Bubble */}
-        <div className="flex flex-col items-center gap-3">
+        <div className="flex flex-col items-center gap-2.5 shrink-0 mb-4">
           {/* Logo Icon */}
           <Link
             to="/"
@@ -95,7 +95,7 @@ export default function Sidebar({ role = 'customer', mobileOpen = false, onClose
         </div>
 
         {/* Middle: Navigation Column of Circular Buttons */}
-        <nav className="flex flex-col items-center my-auto py-2">
+        <nav className="flex-1 w-full flex flex-col items-center overflow-y-auto overflow-x-hidden no-scrollbar py-1">
           <ul className="flex flex-col items-center space-y-2.5">
             {links.map((l) => (
               <li key={l.to} className="relative flex justify-center group">
@@ -132,7 +132,7 @@ export default function Sidebar({ role = 'customer', mobileOpen = false, onClose
         </nav>
 
         {/* Bottom: Settings, User Avatar & Logout */}
-        <div className="flex flex-col items-center space-y-2.5 pt-2 border-t border-ink-100 dark:border-ink-800/80 w-full">
+        <div className="mt-auto flex flex-col items-center space-y-2.5 pt-3 border-t border-ink-100 dark:border-ink-800/80 w-full shrink-0">
           {/* Customer Settings */}
           {role === 'customer' && (
             <div className="relative flex justify-center group">
