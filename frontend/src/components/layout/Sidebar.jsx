@@ -19,10 +19,10 @@ const CUSTOMER_LINKS = [
 
 const ADMIN_LINKS = [
   { to: '/admin/customers',               label: 'Customers',             icon: Users },
+  { to: '/admin/products',                label: 'Products',              icon: Package },
   { to: '/admin/purchase-prediction',     label: 'Purchase Prediction',   icon: TrendingUp },
   { to: '/admin/churn-prediction',        label: 'Churn Prediction',      icon: AlertOctagon },
   { to: '/admin/hyperparameter-tuning',   label: 'Hyperparameter Tuning', icon: SlidersHorizontal },
-  { to: '/admin/products',                label: 'Products',              icon: Package },
   { to: '/admin/visual-recognition',      label: 'Visual Recognition',    icon: ScanEye },
   { to: '/admin/demand-forecasting',      label: 'Demand Forecasting',    icon: BarChart2 },
   { to: '/admin/synthetic-data',          label: 'Synthetic Data',        icon: Database },
