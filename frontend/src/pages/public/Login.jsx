@@ -31,7 +31,7 @@ export default function Login() {
     try {
       const account = await login(email, password);
       showToast('Login successful.', 'success');
-      navigate(account.role === 'admin' ? '/admin' : '/dashboard');
+      navigate(account.role === 'admin' ? '/admin/customers' : '/customer/products');
     } catch (err) {
       setErrors({ form: err.message });
       showToast(err.message, 'error');

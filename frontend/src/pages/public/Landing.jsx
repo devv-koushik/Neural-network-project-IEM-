@@ -290,7 +290,7 @@ export default function Landing() {
           <Link to="/products">Products</Link>
           {user ? (
             <>
-              <Link to={user.role === 'admin' ? '/admin' : '/dashboard'}>Dashboard</Link>
+              <Link to={user.role === 'admin' ? '/admin/customers' : '/customer/products'}>{user.role === 'admin' ? 'Admin' : 'Shop'}</Link>
               <button
                 type="button"
                 onClick={handleLogout}

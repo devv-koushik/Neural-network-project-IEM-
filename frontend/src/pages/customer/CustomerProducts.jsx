@@ -15,7 +15,11 @@ export default function CustomerProducts() {
   }, []);
 
   return (
-    <DashboardLayout role="customer">
+    <DashboardLayout
+      role="customer"
+      title="Store Products"
+      subtitle="Explore curated catalog, filter by category, and enjoy instant checkout"
+    >
       <ProductsBody products={products} loading={loading} />
     </DashboardLayout>
   );

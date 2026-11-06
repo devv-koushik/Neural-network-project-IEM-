@@ -9,11 +9,7 @@ import Login from './pages/public/Login';
 import Register from './pages/public/Register';
 
 // Customer pages
-import CustomerDashboard from './pages/customer/CustomerDashboard';
 import CustomerProducts from './pages/customer/CustomerProducts';
-import AIPrediction from './pages/customer/AIPrediction';
-import PredictionResult from './pages/customer/PredictionResult';
-import PredictionHistory from './pages/customer/PredictionHistory';
 import Profile from './pages/customer/Profile';
 
 // Admin pages
@@ -40,14 +36,16 @@ export default function App() {
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
 
-      {/* Customer */}
-      <Route path="/dashboard" element={<ProtectedRoute role="customer"><CustomerDashboard /></ProtectedRoute>} />
+      {/* Customer — Products catalog landing page & dedicated feature tabs */}
+      <Route path="/dashboard" element={<Navigate to="/customer/products" replace />} />
+      <Route path="/customer" element={<Navigate to="/customer/products" replace />} />
       <Route path="/customer/products" element={<ProtectedRoute role="customer"><CustomerProducts /></ProtectedRoute>} />
-      <Route path="/predict" element={<ProtectedRoute role="customer"><AIPrediction /></ProtectedRoute>} />
-      <Route path="/predict/result" element={<ProtectedRoute role="customer"><PredictionResult /></ProtectedRoute>} />
-      <Route path="/predict/history" element={<ProtectedRoute role="customer"><PredictionHistory /></ProtectedRoute>} />
       <Route path="/visual-recognition" element={<ProtectedRoute role="customer"><VisualRecognition role="customer" /></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute role="customer"><Profile /></ProtectedRoute>} />
+      {/* Legacy prediction paths redirect seamlessly to products */}
+      <Route path="/predict" element={<Navigate to="/customer/products" replace />} />
+      <Route path="/predict/result" element={<Navigate to="/customer/products" replace />} />
+      <Route path="/predict/history" element={<Navigate to="/customer/products" replace />} />
 
       {/* Admin — Core Management & Analytics */}
       <Route path="/admin" element={<Navigate to="/admin/customers" replace />} />

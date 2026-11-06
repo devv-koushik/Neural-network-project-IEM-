@@ -1,19 +1,18 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {
-  LayoutDashboard, ShoppingBag, Brain, History, User, Users, TrendingUp,
+  ShoppingBag, ScanEye, ShoppingCart, User, Users, TrendingUp,
   AlertOctagon, SlidersHorizontal, Package,
-  ScanEye, BarChart2, Database, Wand2,
-  X, LogOut, Settings, Sparkles,
+  BarChart2, Database, Wand2,
+  X, LogOut, Sparkles,
 } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useToast } from '../../hooks/useToast';
+import { useCart } from '../../hooks/useCart';
 
 const CUSTOMER_LINKS = [
-  { to: '/dashboard',          label: 'Dashboard',          icon: LayoutDashboard, end: true },
   { to: '/customer/products',  label: 'Products',           icon: ShoppingBag },
-  { to: '/predict',            label: 'AI Prediction',       icon: Brain },
-  { to: '/predict/history',    label: 'Prediction History',  icon: History },
   { to: '/visual-recognition', label: 'Visual Recognition',  icon: ScanEye },
+  { to: '#cart',               label: 'Shopping Cart',      icon: ShoppingCart, isCart: true },
   { to: '/profile',            label: 'Profile',             icon: User },
 ];
 
@@ -32,6 +31,7 @@ const ADMIN_LINKS = [
 export default function Sidebar({ role = 'customer', mobileOpen = false, onClose }) {
   const links = role === 'admin' ? ADMIN_LINKS : CUSTOMER_LINKS;
   const { user, logout } = useAuth();
+  const { totalCount, openCart } = useCart();
   const { showToast } = useToast();
   const navigate = useNavigate();
 
@@ -101,31 +101,53 @@ export default function Sidebar({ role = 'customer', mobileOpen = false, onClose
           <ul className="flex flex-col items-center space-y-2.5 overflow-visible">
             {links.map((l) => (
               <li key={l.to} className="relative flex justify-center group overflow-visible">
-                <NavLink
-                  to={l.to}
-                  end={l.end}
-                  className={({ isActive }) =>
-                    `relative flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200 ${
-                      isActive
-                        ? 'bg-signal-500 text-white dark:bg-white dark:text-ink-950 shadow-lg shadow-signal-500/25 dark:shadow-white/10 font-bold scale-105'
-                        : 'bg-ink-100 dark:bg-ink-850/80 text-ink-500 dark:text-ink-400 hover:bg-ink-200 dark:hover:bg-ink-750 hover:text-ink-900 dark:hover:text-white hover:scale-105'
-                    }`
-                  }
-                  aria-label={l.label}
-                >
-                  {({ isActive }) => (
-                    <l.icon size={18} strokeWidth={isActive ? 2.2 : 1.8} />
-                  )}
-                </NavLink>
+                {l.isCart ? (
+                  <button
+                    type="button"
+                    onClick={openCart}
+                    className="relative flex h-11 w-11 items-center justify-center rounded-full bg-ink-100 dark:bg-ink-850/80 text-ink-500 dark:text-ink-400 hover:bg-ink-200 dark:hover:bg-ink-750 hover:text-signal-500 dark:hover:text-signal-400 hover:scale-105 transition-all duration-200"
+                    aria-label={`Shopping cart with ${totalCount} items`}
+                  >
+                    <l.icon size={18} strokeWidth={1.8} />
+                    {totalCount > 0 && (
+                      <span className="absolute -top-1 -right-1 flex h-4 min-w-4 items-center justify-center rounded-full bg-signal-500 px-1 text-[9px] font-bold text-white shadow-sm ring-2 ring-white dark:ring-ink-950">
+                        {totalCount}
+                      </span>
+                    )}
+                  </button>
+                ) : (
+                  <NavLink
+                    to={l.to}
+                    end={l.end}
+                    className={({ isActive }) =>
+                      `relative flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200 ${
+                        isActive
+                          ? 'bg-signal-500 text-white dark:bg-white dark:text-ink-950 shadow-lg shadow-signal-500/25 dark:shadow-white/10 font-bold scale-105'
+                          : 'bg-ink-100 dark:bg-ink-850/80 text-ink-500 dark:text-ink-400 hover:bg-ink-200 dark:hover:bg-ink-750 hover:text-ink-900 dark:hover:text-white hover:scale-105'
+                      }`
+                    }
+                    aria-label={l.label}
+                  >
+                    {({ isActive }) => (
+                      <l.icon size={18} strokeWidth={isActive ? 2.2 : 1.8} />
+                    )}
+                  </NavLink>
+                )}
 
                 {/* Hover Expandable Option Name */}
                 <div className="pointer-events-none absolute left-[56px] top-1/2 -translate-y-1/2 z-[80] flex items-center pl-2 opacity-0 -translate-x-2 scale-95 transition-all duration-200 ease-out group-hover:pointer-events-auto group-hover:opacity-100 group-hover:translate-x-0 group-hover:scale-100 drop-shadow-xl">
                   <div className="h-2 w-2 -mr-1 rotate-45 bg-ink-900 dark:bg-white shrink-0 shadow-sm" />
                   <div className="flex items-center gap-2 rounded-xl bg-ink-900 dark:bg-white text-white dark:text-ink-950 px-3.5 py-2 text-xs font-semibold shadow-2xl border border-ink-800 dark:border-ink-200 whitespace-nowrap">
                     <span>{l.label}</span>
-                    <span className="text-[10px] font-normal opacity-60">
-                      {role === 'admin' ? 'Admin' : 'Portal'}
-                    </span>
+                    {l.isCart ? (
+                      <span className="text-[10px] font-normal opacity-60">
+                        {totalCount > 0 ? `${totalCount} item${totalCount === 1 ? '' : 's'}` : 'Empty'}
+                      </span>
+                    ) : (
+                      <span className="text-[10px] font-normal opacity-60">
+                        {role === 'admin' ? 'Admin' : 'Portal'}
+                      </span>
+                    )}
                   </div>
                 </div>
               </li>
@@ -133,34 +155,8 @@ export default function Sidebar({ role = 'customer', mobileOpen = false, onClose
           </ul>
         </nav>
 
-        {/* Bottom: Settings, User Avatar & Logout */}
+        {/* Bottom: User Avatar & Logout */}
         <div className="mt-auto flex flex-col items-center space-y-2.5 pt-3 border-t border-ink-100 dark:border-ink-800/80 w-full shrink-0 overflow-visible">
-          {/* Customer Settings */}
-          {role === 'customer' && (
-            <div className="relative flex justify-center group overflow-visible">
-              <NavLink
-                to="/profile"
-                className={({ isActive }) =>
-                  `flex h-11 w-11 items-center justify-center rounded-full transition-all duration-200 ${
-                    isActive
-                      ? 'bg-signal-500 text-white dark:bg-white dark:text-ink-950 shadow-md font-bold'
-                      : 'bg-ink-100 dark:bg-ink-850/80 text-ink-500 dark:text-ink-400 hover:bg-ink-200 dark:hover:bg-ink-750 hover:text-ink-900 dark:hover:text-white hover:scale-105'
-                  }`
-                }
-                aria-label="Account Settings"
-              >
-                <Settings size={18} />
-              </NavLink>
-
-              {/* Hover Expand */}
-              <div className="pointer-events-none absolute left-[56px] top-1/2 -translate-y-1/2 z-[80] flex items-center pl-2 opacity-0 -translate-x-2 scale-95 transition-all duration-200 ease-out group-hover:pointer-events-auto group-hover:opacity-100 group-hover:translate-x-0 group-hover:scale-100 drop-shadow-xl">
-                <div className="h-2 w-2 -mr-1 rotate-45 bg-ink-900 dark:bg-white shrink-0 shadow-sm" />
-                <div className="rounded-xl bg-ink-900 dark:bg-white text-white dark:text-ink-950 px-3.5 py-2 text-xs font-semibold shadow-2xl border border-ink-800 dark:border-ink-200 whitespace-nowrap">
-                  Account Settings
-                </div>
-              </div>
-            </div>
-          )}
 
           {/* User Avatar */}
           <div className="relative flex justify-center group overflow-visible">
@@ -237,27 +233,50 @@ export default function Sidebar({ role = 'customer', mobileOpen = false, onClose
         <ul className="space-y-1.5">
           {links.map((l) => (
             <li key={l.to}>
-              <NavLink
-                to={l.to}
-                end={l.end}
-                onClick={onClose}
-                className={({ isActive }) =>
-                  `flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-medium transition-all duration-200 ${
-                    isActive
-                      ? 'bg-signal-500 text-white font-semibold shadow-sm'
-                      : 'text-ink-600 dark:text-ink-300 hover:bg-ink-100 dark:hover:bg-ink-800'
-                  }`
-                }
-              >
-                {({ isActive }) => (
-                  <>
-                    <div className={`flex h-8 w-8 items-center justify-center rounded-full ${isActive ? 'bg-white/20 text-white' : 'bg-ink-100 dark:bg-ink-800 text-ink-500'}`}>
+              {l.isCart ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (onClose) onClose();
+                    openCart();
+                  }}
+                  className="w-full flex items-center justify-between rounded-2xl px-3.5 py-2.5 text-sm font-medium text-ink-600 dark:text-ink-300 hover:bg-ink-100 dark:hover:bg-ink-800 transition-all duration-200"
+                >
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-8 w-8 items-center justify-center rounded-full bg-ink-100 dark:bg-ink-800 text-ink-500">
                       <l.icon size={16} />
                     </div>
                     <span>{l.label}</span>
-                  </>
-                )}
-              </NavLink>
+                  </div>
+                  {totalCount > 0 && (
+                    <span className="flex h-5 min-w-5 items-center justify-center rounded-full bg-signal-500 px-1.5 text-xs font-bold text-white">
+                      {totalCount}
+                    </span>
+                  )}
+                </button>
+              ) : (
+                <NavLink
+                  to={l.to}
+                  end={l.end}
+                  onClick={onClose}
+                  className={({ isActive }) =>
+                    `flex items-center gap-3 rounded-2xl px-3.5 py-2.5 text-sm font-medium transition-all duration-200 ${
+                      isActive
+                        ? 'bg-signal-500 text-white font-semibold shadow-sm'
+                        : 'text-ink-600 dark:text-ink-300 hover:bg-ink-100 dark:hover:bg-ink-800'
+                    }`
+                  }
+                >
+                  {({ isActive }) => (
+                    <>
+                      <div className={`flex h-8 w-8 items-center justify-center rounded-full ${isActive ? 'bg-white/20 text-white' : 'bg-ink-100 dark:bg-ink-800 text-ink-500'}`}>
+                        <l.icon size={16} />
+                      </div>
+                      <span>{l.label}</span>
+                    </>
+                  )}
+                </NavLink>
+              )}
             </li>
           ))}
         </ul>

@@ -36,7 +36,7 @@ export default function Register() {
     try {
       await register(form.name, form.email, form.password);
       showToast('Account created. Welcome to SmartCart AI!', 'success');
-      navigate('/dashboard');
+      navigate('/customer/products');
     } catch {
       showToast('Something went wrong. Please try again.', 'error');
     } finally {

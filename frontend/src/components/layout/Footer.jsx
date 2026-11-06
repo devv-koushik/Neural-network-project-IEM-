@@ -26,8 +26,8 @@ export default function Footer() {
             <h4 className="text-xs font-semibold uppercase tracking-wide text-ink-800 dark:text-ink-100 mb-3">Product</h4>
             <ul className="space-y-2 text-sm text-ink-400">
               <li><Link to="/products" className="hover:text-signal-500">Products</Link></li>
-              <li><Link to="/dashboard" className="hover:text-signal-500">Dashboard</Link></li>
-              <li><Link to="/predict" className="hover:text-signal-500">AI Prediction</Link></li>
+              <li><Link to="/visual-recognition" className="hover:text-signal-500">Visual Recognition</Link></li>
+              <li><Link to="/profile" className="hover:text-signal-500">My Account</Link></li>
             </ul>
           </div>
           <div>

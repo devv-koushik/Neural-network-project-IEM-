@@ -89,8 +89,8 @@ export default function Navbar() {
 
           {user ? (
             <>
-              <Button variant="secondary" icon={LayoutDashboard} onClick={() => navigate(user.role === 'admin' ? '/admin/customers' : '/dashboard')}>
-                {user.role === 'admin' ? 'Admin Console' : 'Dashboard'}
+              <Button variant="secondary" icon={LayoutDashboard} onClick={() => navigate(user.role === 'admin' ? '/admin/customers' : '/customer/products')}>
+                {user.role === 'admin' ? 'Admin Console' : 'Shop Products'}
               </Button>
               <Button variant="ghost" icon={LogOut} onClick={handleLogout}>Logout</Button>
             </>
@@ -163,8 +163,8 @@ export default function Navbar() {
             </div>
             {user ? (
               <>
-                <Button variant="secondary" className="mt-2 w-full" onClick={() => { setOpen(false); navigate(user.role === 'admin' ? '/admin/customers' : '/dashboard'); }}>
-                  {user.role === 'admin' ? 'Admin Console' : 'Dashboard'}
+                <Button variant="secondary" className="mt-2 w-full" onClick={() => { setOpen(false); navigate(user.role === 'admin' ? '/admin/customers' : '/customer/products'); }}>
+                  {user.role === 'admin' ? 'Admin Console' : 'Shop Products'}
                 </Button>
                 <Button variant="ghost" className="w-full" onClick={() => { setOpen(false); handleLogout(); }}>Logout</Button>
               </>
