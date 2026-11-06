@@ -1,6 +1,6 @@
 import { Link, NavLink, useNavigate } from 'react-router-dom';
 import {
-  ShoppingBag, ScanEye, ShoppingCart, User, Users, TrendingUp,
+  ShoppingBag, ScanEye, ShoppingCart, Users, TrendingUp,
   AlertOctagon, SlidersHorizontal, Package,
   BarChart2, Database, Wand2,
   X, LogOut, Sparkles,
@@ -13,7 +13,6 @@ const CUSTOMER_LINKS = [
   { to: '/customer/products',  label: 'Products',           icon: ShoppingBag },
   { to: '/visual-recognition', label: 'Visual Recognition',  icon: ScanEye },
   { to: '#cart',               label: 'Shopping Cart',      icon: ShoppingCart, isCart: true },
-  { to: '/profile',            label: 'Profile',             icon: User },
 ];
 
 const ADMIN_LINKS = [
@@ -158,21 +157,31 @@ export default function Sidebar({ role = 'customer', mobileOpen = false, onClose
         {/* Bottom: User Avatar & Logout */}
         <div className="mt-auto flex flex-col items-center space-y-2.5 pt-3 border-t border-ink-100 dark:border-ink-800/80 w-full shrink-0 overflow-visible">
 
-          {/* User Avatar */}
+          {/* User Avatar / Profile Link */}
           <div className="relative flex justify-center group overflow-visible">
-            <div
-              className="flex h-10 w-10 items-center justify-center rounded-full bg-signal-500 text-white text-xs font-bold shadow-sm hover:scale-105 transition-all cursor-default"
-              aria-label={`Logged in as ${user?.name || 'User'}`}
+            <NavLink
+              to="/profile"
+              className={({ isActive }) =>
+                `flex h-10 w-10 items-center justify-center rounded-full text-xs font-bold transition-all duration-200 cursor-pointer ${
+                  isActive
+                    ? 'bg-signal-500 text-white shadow-lg shadow-signal-500/30 ring-2 ring-signal-500 ring-offset-2 dark:ring-offset-ink-950 scale-105'
+                    : 'bg-signal-500 text-white hover:scale-110 hover:shadow-md'
+                }`
+              }
+              aria-label={`View Profile: ${user?.name || 'User'}`}
             >
               {user?.name?.[0]?.toUpperCase() || 'U'}
-            </div>
+            </NavLink>
 
             {/* Hover Expand */}
             <div className="pointer-events-none absolute left-[56px] top-1/2 -translate-y-1/2 z-[80] flex items-center pl-2 opacity-0 -translate-x-2 scale-95 transition-all duration-200 ease-out group-hover:pointer-events-auto group-hover:opacity-100 group-hover:translate-x-0 group-hover:scale-100 drop-shadow-xl">
               <div className="h-2 w-2 -mr-1 rotate-45 bg-ink-900 dark:bg-white shrink-0 shadow-sm" />
               <div className="flex flex-col rounded-xl bg-ink-900 dark:bg-white text-white dark:text-ink-950 px-3.5 py-2 text-xs shadow-2xl border border-ink-800 dark:border-ink-200 whitespace-nowrap">
-                <span className="font-bold text-sm">{user?.name || 'User'}</span>
-                <span className="text-[10px] opacity-70">{user?.email || ''}</span>
+                <div className="flex items-center gap-1.5 font-bold text-sm">
+                  <span>{user?.name || 'User'}</span>
+                  <span className="text-[9px] font-semibold uppercase px-1.5 py-0.5 rounded-full bg-signal-500/10 text-signal-500 dark:bg-signal-500/20">Profile</span>
+                </div>
+                <span className="text-[10px] opacity-70">{user?.email || 'Click to open profile'}</span>
               </div>
             </div>
           </div>
@@ -283,15 +292,28 @@ export default function Sidebar({ role = 'customer', mobileOpen = false, onClose
       </nav>
 
       <div className="px-4 pb-5 pt-3 border-t border-ink-100 dark:border-ink-800 space-y-2">
-        <div className="flex items-center gap-2.5 rounded-xl bg-ink-50 dark:bg-ink-850 p-2.5">
+        <NavLink
+          to="/profile"
+          onClick={onClose}
+          className={({ isActive }) =>
+            `flex items-center gap-2.5 rounded-xl p-2.5 transition-colors ${
+              isActive
+                ? 'bg-signal-500/10 text-signal-500 dark:bg-signal-500/15 font-semibold ring-1 ring-signal-500/30'
+                : 'bg-ink-50 dark:bg-ink-850 hover:bg-ink-100 dark:hover:bg-ink-800 text-ink-800 dark:text-white'
+            }`
+          }
+        >
           <div className="flex h-8 w-8 items-center justify-center rounded-full bg-signal-500 text-xs font-bold text-white shrink-0">
             {user?.name?.[0]?.toUpperCase() || 'U'}
           </div>
           <div className="min-w-0 flex-1">
-            <p className="truncate text-xs font-semibold text-ink-800 dark:text-white">{user?.name || 'User'}</p>
-            <p className="truncate text-[10px] text-ink-400">{user?.email || ''}</p>
+            <div className="flex items-center justify-between">
+              <p className="truncate text-xs font-semibold">{user?.name || 'User'}</p>
+              <span className="text-[9px] font-semibold text-signal-500 uppercase tracking-wide">Profile →</span>
+            </div>
+            <p className="truncate text-[10px] text-ink-400">{user?.email || 'View Profile'}</p>
           </div>
-        </div>
+        </NavLink>
 
         <button
           onClick={handleLogout}
