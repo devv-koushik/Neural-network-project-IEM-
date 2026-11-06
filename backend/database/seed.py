@@ -25,11 +25,20 @@ from datetime import datetime, timedelta, timezone
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 
-FIRST_NAMES = ['Ava', 'Liam', 'Maya', 'Noah', 'Priya', 'Ethan', 'Zara', 'Leo', 'Ines', 'Omar',
-               'Chloe', 'Kenji', 'Nina', 'Mateo', 'Sofia', 'Ravi', 'Elena', 'Jack', 'Amara', 'Felix',
-               'Yuki', 'Grace', 'Theo', 'Lucia']
-LAST_NAMES = ['Patel', 'Nguyen', 'Garcia', 'Smith', 'Kowalski', 'Rossi', 'Kim', 'Johansson', 'Silva', 'Khan',
-              'Novak', 'Alves', 'Chen', 'Dubois', 'Osei', 'Ferreira', 'Haddad', 'Larsen', 'Yamamoto', 'Torres']
+FIRST_NAMES = [
+    'Aarav', 'Ananya', 'Rohan', 'Priya', 'Vikram', 'Ishita', 'Aditya', 'Sneha',
+    'Arjun', 'Pooja', 'Kabir', 'Neha', 'Siddharth', 'Riya', 'Aryan', 'Meera',
+    'Kunal', 'Tanvi', 'Dev', 'Kavya', 'Varun', 'Shreya', 'Amit', 'Aditi',
+    'Nikhil', 'Anjali', 'Rohit', 'Roshni', 'Pranav', 'Swati', 'Karthik', 'Divya',
+    'Harsh', 'Simran', 'Yash', 'Deepa', 'Manav', 'Nidhi', 'Akash', 'Shruti',
+    'Gaurav', 'Tara', 'Rishi', 'Komal', 'Suresh', 'Bhavna', 'Alok', 'Pallavi'
+]
+LAST_NAMES = [
+    'Sharma', 'Verma', 'Patel', 'Iyer', 'Gupta', 'Reddy', 'Chatterjee', 'Rao',
+    'Singh', 'Nair', 'Joshi', 'Mehta', 'Kulkarni', 'Mukherjee', 'Das', 'Malhotra',
+    'Menon', 'Deshmukh', 'Agarwal', 'Bhat', 'Kapoor', 'Pillai', 'Saxena', 'Goswami',
+    'Nambiar', 'Sen', 'Bansal', 'Hegde', 'Chauhan', 'Ghosh', 'Bose', 'Mishra'
+]
 
 PRODUCTS_SEED = [
     {'name': 'Aurora Wireless ANC Headphones', 'category': 'Electronics', 'price': 179.99, 'rating': 4.7, 'reviews': 812, 'stock': 34, 'color': '#5B6EF5', 'featured': True, 'image_url': '/dataset/Electronics/electronics_001.jpg', 'description': 'Adaptive noise cancellation with 40-hour battery life and spatial audio tuning.'},
@@ -80,7 +89,7 @@ def seed_core():
     print('Seeding demo users...')
     customer_user = User(name='Pritam Customer', email='customer@demo.com', role='customer')
     customer_user.set_password('customer123')
-    admin_user = User(name='Jordan Admin', email='admin@demo.com', role='admin')
+    admin_user = User(name='Koushik Admin', email='admin@demo.com', role='admin')
     admin_user.set_password('admin123')
     db.session.add_all([customer_user, admin_user])
     db.session.flush()
@@ -95,7 +104,7 @@ def seed_core():
     customers = []
     for i, row in enumerate(rows):
         first = FIRST_NAMES[i % len(FIRST_NAMES)]
-        last = LAST_NAMES[(i // len(FIRST_NAMES)) % len(LAST_NAMES)]
+        last = LAST_NAMES[(i * 7 + 3) % len(LAST_NAMES)]
         behavior_data = {
             'age': int(row['Age']),
             'gender': row['Gender'],

@@ -196,8 +196,15 @@ def generate_synthetic_tabular_data(source_df: pd.DataFrame, num_records: int = 
     syn_df['Support_Interactions'] = np.clip(np.round(syn_df['Support_Interactions']), 0, 10).astype(int)
 
     # 6. Generate synthetic customer names
-    first_names = ['Pritam', 'Alex', 'Taylor', 'Jordan', 'Morgan', 'Casey', 'Sam', 'Chris', 'Riley', 'Avery', 'Devon', 'Jesse']
-    last_names = ['Sharma', 'Smith', 'Patel', 'Johnson', 'Williams', 'Brown', 'Jones', 'Miller', 'Davis', 'Wilson', 'Moore']
+    first_names = [
+        'Aarav', 'Ananya', 'Rohan', 'Priya', 'Vikram', 'Ishita', 'Aditya', 'Sneha',
+        'Arjun', 'Pooja', 'Kabir', 'Neha', 'Siddharth', 'Riya', 'Aryan', 'Meera',
+        'Kunal', 'Tanvi', 'Dev', 'Kavya', 'Varun', 'Shreya', 'Amit', 'Aditi'
+    ]
+    last_names = [
+        'Sharma', 'Verma', 'Patel', 'Iyer', 'Gupta', 'Reddy', 'Chatterjee', 'Rao',
+        'Singh', 'Nair', 'Joshi', 'Mehta', 'Kulkarni', 'Mukherjee', 'Das', 'Malhotra'
+    ]
     syn_df['name'] = [f'{np.random.choice(first_names)} {np.random.choice(last_names)}' for _ in range(num_records)]
 
     # 7. Comprehensive Statistical Evaluation

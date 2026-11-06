@@ -1,8 +1,21 @@
 // Centralized mock customer dataset used across admin analytics pages.
 // Replace with GET /api/customers when Flask backend is connected.
 
-const FIRST = ['Ava', 'Liam', 'Maya', 'Noah', 'Priya', 'Ethan', 'Zara', 'Leo', 'Ines', 'Omar', 'Chloe', 'Kenji', 'Nina', 'Mateo', 'Sofia', 'Ravi', 'Elena', 'Jack', 'Amara', 'Felix', 'Yuki', 'Grace', 'Theo', 'Lucia'];
-const LAST = ['Patel', 'Nguyen', 'Garcia', 'Smith', 'Kowalski', 'Rossi', 'Kim', 'Johansson', 'Silva', 'Khan', 'Novak', 'Alves', 'Chen', 'Dubois', 'Osei', 'Ferreira', 'Haddad', 'Larsen', 'Yamamoto', 'Torres'];
+const FIRST = [
+  'Aarav', 'Ananya', 'Rohan', 'Priya', 'Vikram', 'Ishita', 'Aditya', 'Sneha',
+  'Arjun', 'Pooja', 'Kabir', 'Neha', 'Siddharth', 'Riya', 'Aryan', 'Meera',
+  'Kunal', 'Tanvi', 'Dev', 'Kavya', 'Varun', 'Shreya', 'Amit', 'Aditi',
+  'Nikhil', 'Anjali', 'Rohit', 'Roshni', 'Pranav', 'Swati', 'Karthik', 'Divya',
+  'Harsh', 'Simran', 'Yash', 'Deepa', 'Manav', 'Nidhi', 'Akash', 'Shruti',
+  'Gaurav', 'Tara', 'Rishi', 'Komal', 'Suresh', 'Bhavna', 'Alok', 'Pallavi'
+];
+
+const LAST = [
+  'Sharma', 'Verma', 'Patel', 'Iyer', 'Gupta', 'Reddy', 'Chatterjee', 'Rao',
+  'Singh', 'Nair', 'Joshi', 'Mehta', 'Kulkarni', 'Mukherjee', 'Das', 'Malhotra',
+  'Menon', 'Deshmukh', 'Agarwal', 'Bhat', 'Kapoor', 'Pillai', 'Saxena', 'Goswami',
+  'Nambiar', 'Sen', 'Bansal', 'Hegde', 'Chauhan', 'Ghosh', 'Bose', 'Mishra'
+];
 
 function seededRandom(seed) {
   let s = seed;
@@ -15,7 +28,7 @@ function seededRandom(seed) {
 function buildCustomer(i) {
   const rnd = seededRandom(i * 137 + 7);
   const first = FIRST[i % FIRST.length];
-  const last = LAST[Math.floor(i / FIRST.length) % LAST.length];
+  const last = LAST[(i * 7 + 3) % LAST.length];
   const age = 18 + Math.floor(rnd() * 50);
   const purchases = Math.floor(rnd() * 40);
   const sessions = Math.floor(rnd() * 60) + 1;
