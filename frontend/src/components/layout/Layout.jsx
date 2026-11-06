@@ -52,19 +52,21 @@ export function DashboardLayout({ children, role = 'customer', title, subtitle }
           <div className="flex items-center gap-2 sm:gap-3 shrink-0">
             <ThemeToggle />
 
-            {/* Shopping Cart button */}
-            <button
-              onClick={openCart}
-              className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-ink-200 dark:border-ink-700 text-ink-600 dark:text-ink-300 hover:text-signal-500 hover:border-signal-500/40 transition-colors"
-              aria-label={`Shopping cart with ${totalCount} items`}
-            >
-              <ShoppingCart size={17} />
-              {totalCount > 0 && (
-                <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-signal-500 px-1 text-[10px] font-bold text-white shadow-sm">
-                  {totalCount}
-                </span>
-              )}
-            </button>
+            {/* Shopping Cart button (customers only) */}
+            {role !== 'admin' && (
+              <button
+                onClick={openCart}
+                className="relative flex h-9 w-9 items-center justify-center rounded-xl border border-ink-200 dark:border-ink-700 text-ink-600 dark:text-ink-300 hover:text-signal-500 hover:border-signal-500/40 transition-colors"
+                aria-label={`Shopping cart with ${totalCount} items`}
+              >
+                <ShoppingCart size={17} />
+                {totalCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 flex h-4 min-w-[16px] items-center justify-center rounded-full bg-signal-500 px-1 text-[10px] font-bold text-white shadow-sm">
+                    {totalCount}
+                  </span>
+                )}
+              </button>
+            )}
 
             <button
               className="hidden sm:flex h-9 w-9 items-center justify-center rounded-xl border border-ink-200 dark:border-ink-700 text-ink-500 dark:text-ink-300 hover:bg-ink-50 dark:hover:bg-ink-800 transition-colors"
